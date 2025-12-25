@@ -8,4 +8,5 @@ $baseDir = dirname($vendorDir);
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'FluentShipment\\Database\\DBMigrator' => $baseDir . '/database/DBMigrator.php',
+    'FluentShipment\\Database\\Migrations\\ShipmentMigrator' => $baseDir . '/database/Migrations/ShipmentMigrator.php',
 );

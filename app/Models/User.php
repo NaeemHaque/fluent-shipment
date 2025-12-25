@@ -14,9 +14,4 @@ class User extends Model
     protected $table = 'users';
     
     protected $primaryKey = 'ID';
-
-    public function posts()
-    {
-        return $this->hasMany(Post::class, 'post_author', 'ID');
-    }
 }

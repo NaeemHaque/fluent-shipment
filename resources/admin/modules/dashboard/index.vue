@@ -29,8 +29,5 @@
                 title: 'Dashboard',
             }
         },
-        mounted() {
-            console.log("hello");
-        }
     };
 </script>

@@ -2,7 +2,7 @@
     <transition name="fade" mode="out-in" appear>
         <div>
             <div class="page-header">
-                <h3>Hello Fluent Shipments</h3>
+                <h2>Shipments</h2>
             </div>
 
             <div class="page-content">

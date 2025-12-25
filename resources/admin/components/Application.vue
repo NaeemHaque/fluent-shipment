@@ -30,6 +30,11 @@
                 />
             </div>
         </el-header>
+
+        <!-- Main Content Area -->
+        <el-main>
+            <router-view />
+        </el-main>
     </el-container>
 </template>
 
@@ -57,9 +62,7 @@ export default {
     },
     data() {
         return {
-            primaryMenu: menu.get('primary') || [],
-            secondaryMenu: menu.get('secondary') || [],
-            footerMenu: menu.get('footer') || [],
+            // Menu will be reactive through computed properties
         };
     },
     provide() {
@@ -68,7 +71,15 @@ export default {
         };
     },
     computed: {
-        // ...
+        primaryMenu() {
+            return menu.get('primary') || [];
+        },
+        secondaryMenu() {
+            return menu.get('secondary') || [];
+        },
+        footerMenu() {
+            return menu.get('footer') || [];
+        },
     },
     methods: {
         registerRestRequestInterceptor() {
@@ -87,6 +98,22 @@ export default {
     },
     mounted() {
         this.registerRestRequestInterceptor();
+        
+        // Debug: Log menu data
+        if (typeof __DEV__ !== 'undefined' && __DEV__) {
+            console.log('Application mounted - Primary Menu:', this.primaryMenu);
+            console.log('Application mounted - All Menus:', menu.all());
+        }
+    },
+    watch: {
+        primaryMenu: {
+            handler(newVal) {
+                if (typeof __DEV__ !== 'undefined' && __DEV__) {
+                    console.log('Primary menu updated:', newVal);
+                }
+            },
+            immediate: true
+        }
     }
 };
 </script>

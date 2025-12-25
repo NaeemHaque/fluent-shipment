@@ -33,6 +33,7 @@ class ComposerStaticInit86f0a3e6f6b8e5256c02d7b88ed8884d
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'FluentShipment\\Database\\DBMigrator' => __DIR__ . '/../..' . '/database/DBMigrator.php',
+        'FluentShipment\\Database\\Migrations\\ShipmentMigrator' => __DIR__ . '/../..' . '/database/Migrations/ShipmentMigrator.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
