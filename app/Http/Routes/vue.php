@@ -41,3 +41,10 @@ $router->menu('primary', function($router) {
 });
 
 $item = $router->primary;
+
+$router->menu('secondary', function($router) {
+    $router->add('settings', 'modules/settings')
+        ->name('settings')
+        ->icon('Setting')
+        ->title(__('Settings', 'fluent-shipment'));
+});

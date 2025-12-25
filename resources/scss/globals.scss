@@ -203,12 +203,9 @@ html.dark .brand-logo {
    ============================== */
 .page-header {
     display: flex;
-    padding: 10px;
-    margin-bottom: 20px;
     align-items: center;
     justify-content: space-between;
     color: var(--el-text-color-primary);
-    border-bottom: 1px solid var(--el-border-color);
 }
 
 .page-header h2 {
@@ -229,6 +226,7 @@ html.dark .brand-logo {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    background: var(--el-bg-panel);
 }
 
 .page-title {
