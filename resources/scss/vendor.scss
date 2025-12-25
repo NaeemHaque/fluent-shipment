@@ -1,0 +1,189 @@
+/* ==============================
+   ELEMENT PLUS CUSTOMIZATION
+   ============================== */
+
+/* ------------------------------
+   LIGHT & DARK THEMES
+   ------------------------------ */
+
+.el-button--fluid {
+    width: 100% !important;
+}
+
+/* ------------------------------
+   SELECTS
+   ------------------------------ */
+html.light .el-select,
+html.dark .el-select {
+    width: 100%;
+}
+
+html.light .el-select input,
+html.dark .el-select input {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--el-text-color-primary);
+}
+
+.el-select.is-focus input {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: var(--el-color-primary);
+}
+
+/* ------------------------------
+   DIALOGS
+   ------------------------------ */
+
+.el-dialog .el-dialog__header {
+    display: block;
+    overflow: hidden;
+    background: var(--dialog-header-bg);
+    border: 1px solid var(--dialog-header-border);
+    padding: 15px;
+    margin: -20px -16px 20px;
+    border-radius: 5px 5px 0 0;
+}
+
+.el-dialog .el-dialog__body {
+    padding: 15px 20px;
+}
+
+.el-dialog .el-dialog__headerbtn {
+    top: 0;
+    height: 46px;
+}
+
+.el-dialog .dialog-footer {
+    padding: 10px 20px;
+    text-align: right;
+    box-sizing: border-box;
+    background: var(--dialog-header-bg);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin: 0 -16px -20px;
+}
+
+/* ------------------------------
+   INPUTS / TEXTAREAS / SELECTS / EL-INPUT
+   ------------------------------ */
+
+.el-input__wrapper {
+    padding: 0px !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+input[type=checkbox]:focus,
+input[type=color]:focus,
+input[type=date]:focus,
+input[type=datetime-local]:focus,
+input[type=datetime]:focus,
+input[type=email]:focus,
+input[type=month]:focus,
+input[type=number]:focus,
+input[type=password]:focus,
+input[type=radio]:focus,
+input[type=search]:focus,
+input[type=tel]:focus,
+input[type=text]:focus,
+input[type=time]:focus,
+input[type=url]:focus,
+input[type=week]:focus,
+select:focus {
+    border-color: var(--el-color-primary);
+    box-shadow: none !important;
+    outline: 1px solid transparent
+}
+
+input,
+textarea,
+select,
+.el-input__inner {
+    color: var(--el-text-color-primary);
+    background-color: var(--el-bg-panel);
+    border: 1px solid var(--el-border-color);
+    border-radius: 4px;
+    box-shadow: none;
+    padding: 6px 10px;
+    outline: none;
+}
+
+/* Remove inner focus shadow for el-input */
+.el-input.is-focus .el-input__inner {
+    border-color: var(--el-color-primary);
+    box-shadow: none;
+}
+
+/* Placeholder color */
+input::placeholder,
+textarea::placeholder,
+select::placeholder,
+.el-input__inner::placeholder {
+    color: var(--el-text-color-placeholder);
+    opacity: 1;
+}
+
+/* ------------------------------
+   TAGS
+   ------------------------------ */
+.el-tag + .el-tag {
+    margin-left: 10px;
+}
+
+.el-tag.el-tag--white {
+    background: white;
+    color: black;
+    border-color: white;
+}
+
+.el-tag.el-tag--white .el-tag__close {
+    color: #909399;
+}
+
+.el-tag.el-tag--white .el-tag__close:hover {
+    background-color: #909399;
+    color: #fff;
+}
+
+/* ------------------------------
+   POPOVERS
+   ------------------------------ */
+.el-popover {
+    padding: 10px;
+    text-align: left;
+}
+
+.el-popover .action-buttons {
+    margin: 0;
+    text-align: center;
+}
+
+/* ------------------------------
+   DROPDOWN MENUS
+   ------------------------------ */
+.el-dropdown-menu {
+    padding: 0 15px;
+    list-style: none;
+}
+
+.el-dropdown-menu li {
+    margin: 10px 0;
+}
+
+/* ------------------------------
+   DATE RANGE SEPARATOR
+   ------------------------------ */
+.el-date-editor .el-range-separator {
+    width: auto;
+}
+
+/* ------------------------------
+   RESPONSIVE DIALOGS
+   ------------------------------ */
+@media all and (max-width: 1000px) {
+    .el-dialog {
+        min-width: 80%;
+    }
+}

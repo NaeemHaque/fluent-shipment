@@ -1,0 +1,7 @@
+/test
+.idea
+assets
+node_modules
+fleunt-shipment.zip
+.vscode
+yarn.lock

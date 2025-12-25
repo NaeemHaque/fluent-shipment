@@ -1,0 +1,64 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "86f0a3e6f6b8e5256c02d7b88ed8884d",
+    "packages": [
+        {
+            "name": "wpfluent/framework",
+            "version": "2.11.9",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:wpfluent/framework2x.git",
+                "reference": "ebf5bb58e32d635e84143bc536e5c2147d792538"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wpfluent/framework2x/zipball/ebf5bb58e32d635e84143bc536e5c2147d792538",
+                "reference": "ebf5bb58e32d635e84143bc536e5c2147d792538",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.3|^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.10.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WPFluent\\": "src/WPFluent"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sheikh Heera",
+                    "email": "heera.sheikh77@gmail.com"
+                }
+            ],
+            "description": "A lightweight rest api based framework to build WordPress plugins.",
+            "support": {
+                "source": "https://github.com/wpfluent/framework2x/tree/2.11.9",
+                "issues": "https://github.com/wpfluent/framework2x/issues"
+            },
+            "time": "2025-10-06T15:36:35+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {},
+    "prefer-stable": true,
+    "prefer-lowest": false,
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
+}

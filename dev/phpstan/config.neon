@@ -1,0 +1,108 @@
+includes:
+    - ./../vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 2
+
+    paths:
+        - src
+        - dev/phpstan
+        - ../../app
+        - .
+
+    reportUnmatchedIgnoredErrors: false
+
+    ignoreErrors:
+        # =========================
+        # General unsafe / dynamic
+        # =========================
+        - '#Unsafe usage of new static\(\)#'
+        - '#Call to an undefined static method .*#'
+        - '#Call to an undefined method .*#'
+        - '#Access to an undefined property .*\\Models\\.*#'
+        - '#Possible SQL injection: dynamic column used in .*#'
+        - '#Method .* should return .* but return statement is missing#'
+        - '#@param .* contains generic type .* but class .* is not generic#'
+        - '#Static call to instance method .*\\App::(config|db|request)\(\)#'
+
+        # =========================
+        # Framework / facade noise
+        # =========================
+        - '#Call to static method .* on an unknown class .*#'
+        - '#Call to method .* on an unknown class .*#'
+        - '#Access to property \$.* on an unknown class .*#'
+        - '#Class .* not found#'
+        - '#Function .+ not found\.#'
+        - '#Parameter \$.* has invalid type#'
+        - '#Static call to instance method .*#'
+        - '#Variable \$.* (might not )?be defined#'
+        - '#Parameter \$.* is not contravariant.*#'
+        - '#Could not check compatibility.*because class .* is not available#'
+
+        # =========================
+        # Hook files ($app)
+        # =========================
+        -
+            message: '#Variable \$app (might not )?be defined#'
+            paths:
+                - %currentWorkingDirectory%/../app/Hooks/*.php
+
+        # =========================
+        # AdminMenuHandler
+        # =========================
+        -
+            message: '#Access to an undefined property .*Application::\$__pluginfile__#'
+            paths:
+                - %currentWorkingDirectory%/../app/Hooks/Handlers/AdminMenuHandler.php
+
+        # =========================
+        # Route files ($router / $app)
+        # =========================
+        -
+            message: '#Variable \$router (might not )?be defined#'
+            paths:
+                - %currentWorkingDirectory%/../app/Http/Routes/routes.php
+                - %currentWorkingDirectory%/../app/Http/Routes/api.php
+                - %currentWorkingDirectory%/../app/Http/Routes/vue.php
+
+        -
+            message: '#Undefined variable: \$app#'
+            paths:
+                - %currentWorkingDirectory%/../app/Http/Routes/vue.php
+
+        -
+            message: '#Variable \$app (might not )?be defined#'
+            paths:
+                - %currentWorkingDirectory%/../app/Http/Routes/vue.php
+
+        # =========================
+        # Facades
+        # =========================
+        -
+            message: '#Call to static method .* on an unknown class .*\\Facade\\.*#'
+            paths:
+                - %currentWorkingDirectory%/../app/**/*.php
+
+        # =========================
+        # Request class
+        # =========================
+        -
+            message: '#Parameter \$request of method .* has invalid type .*\\Request\.?#'
+            paths:
+                - %currentWorkingDirectory%/../app/Http/Controllers/*.php
+
+        -
+            message: '#Call to method .* on an unknown class .*\\Request\.?#'
+            paths:
+                - %currentWorkingDirectory%/../app/Http/Controllers/*.php
+
+        -
+            message: '#Access to property \$.* on an unknown class .*\\Request\\Request#'
+            paths:
+                - %currentWorkingDirectory%/../app/Http/Controllers
+
+services:
+    -
+        class: WpFluent\PHPStanRules\NoUnsafeSqlRule
+        tags:
+            - phpstan.rules.rule

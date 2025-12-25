@@ -1,0 +1,346 @@
+/* ==============================
+   VARIABLES
+   ============================== */
+:root.light {
+    --el-color-primary: rgba(64,158,255,1);         /* Brand blue */
+    --el-color-success: rgba(103,194,58,1);         /* Green success */
+    --el-color-warning: rgba(230,162,60,1);         /* Yellow warning */
+    --el-color-danger: rgba(245,108,108,1);         /* Red danger */
+
+    --el-bg-color: rgba(249,249,249,1);             /* Body / main background */
+    --el-bg-menu: rgba(255,255,255,1);              /* Navbar / menu background */
+    --el-bg-panel: rgba(255,255,255,1);             /* Panels / tables */
+
+    --el-text-color-primary: rgba(48,49,51,1);      /* Main text */
+    --el-text-color-secondary: rgba(96,98,102,1);   /* Secondary text */
+    --el-text-color-placeholder: rgba(0,0,0,0.35);  /* Inputs placeholder */
+    
+    --el-border-color: rgba(220,223,230,1);
+    --el-menu-text-color: rgba(48,49,51,1);
+    --el-menu-hover-text-color: var(--el-color-primary);
+}
+
+:root.dark {
+    --el-color-primary: rgba(64,158,255,1);
+    --el-color-success: rgba(103,194,58,1);
+    --el-color-warning: rgba(230,162,60,1);
+    --el-color-danger: rgba(245,108,108,1);
+
+    --el-bg-color: rgba(30,30,47,1);                /* Body / main background */
+    --el-bg-menu: rgba(37,37,54,1);                 /* Navbar / menu background */
+    --el-bg-panel: rgba(42,43,60,1);                /* Panels / tables */
+
+    --el-text-color-primary: rgba(255,255,255,0.82);   /* softened white */
+    --el-text-color-secondary: rgba(255,255,255,0.45);
+    --el-text-color-placeholder: rgba(255,255,255,0.35);
+
+    --el-border-color: rgba(60,61,90,1);
+    --el-menu-text-color: rgba(255,255,255,0.75);
+    --el-menu-hover-text-color: var(--el-color-primary);
+}
+
+/* ==============================
+   HEADINGS (override WP defaults)
+   ============================== */
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6,
+#wpbody.light h1,
+#wpbody.light h2,
+#wpbody.light h3,
+#wpbody.light h4,
+#wpbody.light h5,
+#wpbody.light h6 {
+    color: var(--el-text-color-primary) !important;
+}
+
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6,
+#wpbody.dark h1,
+#wpbody.dark h2,
+#wpbody.dark h3,
+#wpbody.dark h4,
+#wpbody.dark h5,
+#wpbody.dark h6 {
+    color: var(--el-text-color-primary) !important;
+}
+
+
+/* Dialog header */
+html.light { 
+    --dialog-header-bg: rgba(245, 245, 245, 1);   /* #f5f5f5 */
+    --dialog-header-border: rgba(221, 221, 221, 1); /* #ddd */
+}
+
+html.dark { 
+    --dialog-header-bg: rgba(42, 43, 60, 1);       /* #2a2b3c */
+    --dialog-header-border: rgba(68, 68, 68, 1);   /* #444 */
+}
+
+/* ==============================
+   BODY & WPBODY
+   ============================== */
+#wpbody {
+    min-height: 100vh;
+}
+
+#wpbody.light {
+    background: var(--el-bg-color);
+    color: var(--el-text-color-primary);
+}
+
+#wpbody.dark {
+    background: var(--el-bg-color);
+    color: var(--el-text-color-primary);
+}
+
+/* ==============================
+   CONTENT & FOOTER
+   ============================== */
+#wpcontent, #wpfooter {
+    margin-left: 140px;
+}
+
+.folded #wpcontent,
+.folded #wpfooter {
+    margin-left: 16px;
+}
+
+#footer-thankyou {
+    margin-left: 10px;
+}
+
+/* ==============================
+   LAYOUT
+   ============================== */
+.layout {
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px 50px;
+}
+
+/* ==============================
+   BRAND LOGO
+   ============================== */
+.brand-logo {
+    max-width: 100px;
+    margin-left: 5px;
+    margin-right: 10px;
+    padding-top: 10px;
+}
+
+.brand-logo img {
+    outline: none;
+    padding: 2px 0;
+}
+
+.brand-logo a {
+    line-height: 0;
+    display: block;
+    position: relative;
+}
+
+.brand-logo a span {
+    position: absolute;
+    top: 10px;
+    right: -30px;
+}
+
+.brand-logo a:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+html.dark .brand-logo {
+    filter: brightness(0) invert(1);
+}
+
+/* ==============================
+   NAVBAR
+   ============================== */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 50px;
+    border-top: 1px solid var(--el-border-color);
+    border-bottom: 1px solid var(--el-border-color);
+}
+
+.navbar-left,
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left {
+    gap: 24px;
+}
+
+.navbar-right {
+    gap: 16px;
+}
+
+.menu {
+    border-bottom: none;
+    background: transparent;
+}
+
+/* ==============================
+   PAGE HEADER
+   ============================== */
+.page-header {
+    display: flex;
+    padding: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--el-text-color-primary);
+    border-bottom: 1px solid var(--el-border-color);
+}
+
+.page-header h2 {
+    color: var(--el-text-color-primary);
+}
+
+.page-header .page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ==============================
+   PAGE CONTENT
+   ============================== */
+.page-content {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.page-title {
+    margin: 0;
+}
+
+.pagination {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    background: transparent;
+    color: var(--el-text-color-primary);
+}
+
+/* ==============================
+   ELEMENT PLUS INPUTS
+   ============================== */
+html.light input,
+html.light select,
+html.light textarea,
+html.dark input,
+html.dark select,
+html.dark textarea {
+    color: var(--el-text-color-primary);
+    background-color: var(--el-bg-panel);
+    border: 1px solid var(--el-border-color);
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+/* ==============================
+   DIALOG HEADER
+   ============================== */
+.el-dialog .el-dialog__header {
+    display: block;
+    overflow: hidden;
+    background: var(--dialog-header-bg);
+    border: 1px solid var(--dialog-header-border);
+    padding: 15px;
+    margin: -20px -16px 20px;
+    border-radius: 5px 5px 0 0;
+}
+
+/* ==============================
+   DARK MODE SOFT TEXT
+   ============================== */
+html.dark {
+    --el-text-color-primary: rgba(255,255,255,0.82);
+    --el-text-color-secondary: rgba(255,255,255,0.45);
+    --el-text-color-placeholder: rgba(255,255,255,0.35);
+    --el-menu-text-color: rgba(255,255,255,0.75);
+    --el-menu-hover-text-color: rgba(255,255,255,0.9);
+}
+
+
+/* ==============================
+   EL-MENU OVERRIDES
+   ============================== */
+
+/* Hover state (temporary highlight) */
+.el-menu-item:hover,
+.el-menu-item:focus {
+    background-color: transparent !important;
+    color: var(--el-menu-hover-text-color) !important;
+}
+
+/* Active (selected) state — persistent */
+.el-menu-item.is-active {
+    background-color: transparent !important;
+    color: var(--el-color-primary) !important; /* brand blue in both modes */
+    font-weight: 600; /* optional: stronger emphasis */
+}
+
+/* Submenu hover */
+.el-sub-menu__title:hover,
+.el-sub-menu__title:focus {
+    background-color: transparent !important;
+    color: var(--el-menu-hover-text-color) !important;
+}
+
+/* Submenu active */
+.el-sub-menu__title.is-active {
+    background-color: transparent !important;
+    color: var(--el-color-primary) !important;
+    font-weight: 600;
+}
+
+/* ==============================
+   DROPDOWN OVERRIDES
+   ============================== */
+
+/* Remove background on hover/focus/active for triggers */
+.el-dropdown-link:hover,
+.el-dropdown-link:focus,
+.el-dropdown-link:active {
+    background-color: transparent !important;
+}
+
+/* Hover state (temporary highlight) */
+.el-dropdown-menu__item:hover,
+.el-dropdown-menu__item:focus {
+    background-color: transparent !important;
+    color: var(--el-menu-hover-text-color) !important;
+}
+
+/* Active (selected) state — persistent */
+.el-dropdown-menu__item.is-active {
+    background-color: transparent !important;
+    color: var(--el-color-primary) !important;
+    font-weight: 600; /* optional emphasis */
+}
+
+.capitalize {
+    text-transform: capitalize;
+}

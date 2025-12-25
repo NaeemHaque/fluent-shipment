@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<ruleset name="WPFluent PHP Analyzer">
+    <description>PHP Compatibility and WordPress Coding Standards for WPFluent plugin</description>
+
+    <!-- Target directory -->
+    <file>../app</file>
+
+    <!-- PHP Compatibility -->
+    <rule ref="PHPCompatibility">
+        <properties>
+            <property name="testVersion" value="7.4-8.4"/>
+        </properties>
+        <severity>3</severity>
+    </rule>
+
+    <!-- WordPress specific PHP compatibility -->
+    <rule ref="PHPCompatibilityWP">
+        <severity>3</severity>
+    </rule>
+
+    <!-- WordPress Core Coding Standards -->
+    <rule ref="WordPress-Core">
+        <severity>3</severity>
+    </rule>
+
+    <!-- WordPress Extra Coding Standards -->
+    <rule ref="WordPress-Extra">
+        <severity>3</severity>
+    </rule>
+
+    <!-- WordPress Documentation / DocBlocks -->
+    <rule ref="WordPress-Docs">
+        <severity>2</severity>
+    </rule>
+
+    <!-- Disable noisy argument function checks -->
+    <rule ref="PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Auto-fixable style / best practices -->
+    <rule ref="Squiz.Strings.DoubleQuoteUsage.NotRequired" />
+    <rule ref="PEAR.Files.IncludingFile.UseRequireOnce" />
+    <rule ref="Squiz.Classes.SelfMemberReference.NotUsed" />
+    <rule ref="PEAR.Files.IncludingFile.BracketsNotRequired" />
+
+    <!-- Ignore dynamic $app and $router variables -->
+    <exclude-pattern>../app/Hooks/actions.php</exclude-pattern>
+    <exclude-pattern>../app/Hooks/filters.php</exclude-pattern>
+    <exclude-pattern>../app/Hooks/includes.php</exclude-pattern>
+    <exclude-pattern>../app/Http/Routes/routes.php</exclude-pattern>
+    <exclude-pattern>../app/Http/Routes/api.php</exclude-pattern>
+    <exclude-pattern>../app/Http/Routes/vue.php</exclude-pattern>
+</ruleset>
