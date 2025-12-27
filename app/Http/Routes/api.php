@@ -18,7 +18,6 @@ $router->prefix('/shipments')->group(function () use ($router) {
     
     // Bulk operations
     $router->post('/bulk/update-status', [ShipmentController::class, 'bulkUpdateStatus']);
-    $router->post('/bulk/generate-tracking', [ShipmentController::class, 'generateTrackingNumbers']);
     
     // Individual shipment operations
     $router->get('/{id}', [ShipmentController::class, 'show']);

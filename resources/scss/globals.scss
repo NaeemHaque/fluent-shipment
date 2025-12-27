@@ -312,6 +312,41 @@ html.dark {
     gap: 20px;
 }
 
+.filter-tabs-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.bulk-actions-inline {
+    display: flex;
+    align-items: center;
+    background: var(--fluentshipment-primary-button);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.bulk-actions-content {
+    display: flex;
+    align-items: center;
+}
+
+.selected-count {
+    font-weight: 500;
+    font-size: 14px;
+    color: white;
+    margin-right: 12px;
+}
+
+.bulk-actions-inline .el-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+
+
 .fluentshipment-fluid-tab {
     position: relative;
     display: flex;
@@ -447,6 +482,12 @@ html.dark .more-views-select .el-select__placeholder {
         align-items: stretch;
         gap: 12px;
     }
+
+    .filter-tabs-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
     
     .fluentshipment-fluid-tab {
         width: 100%;
@@ -456,5 +497,16 @@ html.dark .more-views-select .el-select__placeholder {
     .fluent_shipment_filter {
         min-width: auto;
         width: 100%;
+    }
+
+    .bulk-actions-inline {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .bulk-actions-content {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
     }
 }

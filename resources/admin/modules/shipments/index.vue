@@ -20,39 +20,56 @@
                     <div class="fluent_shipment_card-header">
                         <div class="fluent_shipment_filters_wrapper">
                             <!-- Primary Filter Tabs (Fluid Tab Style) -->
-                            <div class="fluentshipment-fluid-tab">
-                                <div 
-                                    class="fluentshipment-fluid-tab-active-bar"
-                                    :style="{ transform: `translateX(${getActiveTabPosition()}px)`, width: `${getActiveTabWidth()}px` }"
-                                ></div>
-                                
-                                <div 
-                                    v-for="(label, status) in primaryTabs" 
-                                    :key="status"
-                                    ref="tabItems"
-                                    class="fluentshipment-fluid-tab-item"
-                                    :class="{ 'active': filters.status === status }"
-                                    @click="setActiveTab(status)"
-                                >
-                                    {{ label }}
+                            <div class="filter-tabs-container">
+                                <div class="fluentshipment-fluid-tab">
+                                    <div 
+                                        class="fluentshipment-fluid-tab-active-bar"
+                                        :style="{ transform: `translateX(${getActiveTabPosition()}px)`, width: `${getActiveTabWidth()}px` }"
+                                    ></div>
+                                    
+                                    <div 
+                                        v-for="(label, status) in primaryTabs" 
+                                        :key="status"
+                                        ref="tabItems"
+                                        class="fluentshipment-fluid-tab-item"
+                                        :class="{ 'active': filters.status === status }"
+                                        @click="setActiveTab(status)"
+                                    >
+                                        {{ label }}
+                                    </div>
+                                    
+                                    <!-- More views dropdown -->
+                                    <div class="fluentshipment-fluid-tab-item more-views" v-if="Object.keys(moreTabs).length > 0">
+                                        <el-select
+                                            v-model="selectedMoreTab"
+                                            placeholder="More views"
+                                            @change="handleMoreTabChange"
+                                            class="more-views-select"
+                                            popper-class="more-views-dropdown"
+                                        >
+                                            <el-option
+                                                v-for="(label, status) in moreTabs"
+                                                :key="status"
+                                                :label="label"
+                                                :value="status"
+                                            />
+                                        </el-select>
+                                    </div>
                                 </div>
                                 
-                                <!-- More views dropdown -->
-                                <div class="fluentshipment-fluid-tab-item more-views" v-if="Object.keys(moreTabs).length > 0">
-                                    <el-select
-                                        v-model="selectedMoreTab"
-                                        placeholder="More views"
-                                        @change="handleMoreTabChange"
-                                        class="more-views-select"
-                                        popper-class="more-views-dropdown"
-                                    >
-                                        <el-option
-                                            v-for="(label, status) in moreTabs"
-                                            :key="status"
-                                            :label="label"
-                                            :value="status"
-                                        />
-                                    </el-select>
+                                <!-- Bulk Actions (beside filters when rows selected) -->
+                                <div class="bulk-actions-inline" v-if="selectedRows.length > 0">
+                                    <div class="bulk-actions-content">
+                                        <span class="selected-count">{{ selectedRows.length }} selected</span>
+                                        <el-button size="small" @click="bulkUpdateStatus">
+                                            <el-icon><Edit /></el-icon>
+                                            Update Status
+                                        </el-button>
+                                        <el-button size="small" type="danger" @click="bulkDelete">
+                                            <el-icon><Delete /></el-icon>
+                                            Delete
+                                        </el-button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -78,6 +95,7 @@
                             style="width:100%;"
                             class="fluent_shipment_table"
                             row-key="id"
+                            @selection-change="handleSelectionChange"
                         >
                             <el-table-column type="selection" width="55" />
                             <el-table-column prop="id" label="ID" width="80" sortable />
@@ -206,17 +224,6 @@
                             />
                         </div>
 
-                        <!-- Bulk Actions -->
-                        <div class="bulk-actions" v-show="selectedRows.length > 0">
-                            <el-card>
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <span>{{ selectedRows.length }} selected</span>
-                                    <el-button size="small" @click="bulkUpdateStatus">Update Status</el-button>
-                                    <el-button size="small" @click="generateTrackingNumbers">Generate Tracking</el-button>
-                                    <el-button size="small" type="danger" @click="bulkDelete">Delete</el-button>
-                                </div>
-                            </el-card>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -760,32 +767,6 @@ export default {
                 });
         },
 
-        generateTrackingNumbers() {
-            if (this.selectedRows.length === 0) {
-                this.$notifyError('Please select shipments');
-                return;
-            }
-
-            const data = {
-                shipment_ids: this.selectedRows.map(row => row.id)
-            };
-
-            this.$post('shipments/bulk/generate-tracking', data)
-                .then(res => {
-                    if (res.success) {
-                        this.$notify({
-                            title: 'Success',
-                            message: res.message || 'Tracking numbers generated',
-                            type: 'success'
-                        });
-                        this.selectedRows = [];
-                        this.fetchShipments();
-                    }
-                })
-                .catch(err => {
-                    this.$notifyError('Failed to generate tracking numbers: ' + err.message);
-                });
-        },
 
         bulkDelete() {
             if (this.selectedRows.length === 0) {
@@ -1008,6 +989,11 @@ export default {
             }
             
             return this.$refs.tabItems[activeIndex].offsetWidth;
+        },
+
+        // Table selection
+        handleSelectionChange(selection) {
+            this.selectedRows = selection;
         }
     },
 
