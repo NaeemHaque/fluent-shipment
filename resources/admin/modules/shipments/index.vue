@@ -18,20 +18,56 @@
                 <!-- Filters Section -->
                 <div class="fluent_shipment_card">
                     <div class="fluent_shipment_card-header">
-                        <el-radio-group v-model="filters.status" @change="fetchShipments" class="fluentshipment_filter_btn_group">
-                            <el-radio-button value="">All</el-radio-button>
-                            <el-radio-button value="pending">Pending</el-radio-button>
-                            <el-radio-button value="processing">Processing</el-radio-button>
-                            <el-radio-button value="shipped">Shipped</el-radio-button>
-                            <el-radio-button value="in_transit">In Transit</el-radio-button>
-                            <el-radio-button value="out_for_delivery">Out for Delivery</el-radio-button>
-                            <el-radio-button value="delivered">Delivered</el-radio-button>
-                            <el-radio-button value="failed">Failed</el-radio-button>
-                            <el-radio-button value="cancelled">Cancelled</el-radio-button>
-                        </el-radio-group>
+                        <div class="fluent_shipment_filters_wrapper">
+                            <!-- Primary Filter Tabs (Fluid Tab Style) -->
+                            <div class="fluentshipment-fluid-tab">
+                                <div 
+                                    class="fluentshipment-fluid-tab-active-bar"
+                                    :style="{ transform: `translateX(${getActiveTabPosition()}px)`, width: `${getActiveTabWidth()}px` }"
+                                ></div>
+                                
+                                <div 
+                                    v-for="(label, status) in primaryTabs" 
+                                    :key="status"
+                                    ref="tabItems"
+                                    class="fluentshipment-fluid-tab-item"
+                                    :class="{ 'active': filters.status === status }"
+                                    @click="setActiveTab(status)"
+                                >
+                                    {{ label }}
+                                </div>
+                                
+                                <!-- More views dropdown -->
+                                <div class="fluentshipment-fluid-tab-item more-views" v-if="Object.keys(moreTabs).length > 0">
+                                    <el-select
+                                        v-model="selectedMoreTab"
+                                        placeholder="More views"
+                                        @change="handleMoreTabChange"
+                                        class="more-views-select"
+                                        popper-class="more-views-dropdown"
+                                    >
+                                        <el-option
+                                            v-for="(label, status) in moreTabs"
+                                            :key="status"
+                                            :label="label"
+                                            :value="status"
+                                        />
+                                    </el-select>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- Search Input -->
                         <div class="fluent_shipment_filter">
-                            <el-input v-model="filters.search" placeholder="Tracking number, email, order ID..." clearable/>
+                            <el-input
+                                v-model="filters.search"
+                                placeholder="Tracking number, email, order ID..."
+                                clearable
+                            >
+                                <template #prefix>
+                                    <el-icon><Search /></el-icon>
+                                </template>
+                            </el-input>
                         </div>
                     </div>
 
@@ -203,7 +239,7 @@
                         
                         <el-form-item label="Payment Status">
                             <el-select v-model="importForm.payment_status" placeholder="Filter by payment status">
-                                <el-option label="All Paid Orders" value=""></el-option>
+                                <el-option label="All Orders" value=""></el-option>
                                 <el-option label="Paid" value="paid"></el-option>
                                 <el-option label="Partially Paid" value="partially_paid"></el-option>
                             </el-select>
@@ -211,7 +247,7 @@
                         
                         <el-form-item label="Order Status">
                             <el-select v-model="importForm.order_status" placeholder="Filter by order status">
-                                <el-option label="All Eligible Orders" value=""></el-option>
+                                <el-option label="All Orders" value=""></el-option>
                                 <el-option label="Processing" value="processing"></el-option>
                                 <el-option label="Completed" value="completed"></el-option>
                             </el-select>
@@ -238,23 +274,15 @@
                         </el-form-item>
                     </el-form>
                     
-                    <div class="import-info" v-if="eligibleOrders !== null">
-                        <p><strong>Eligible Orders Found:</strong> {{ eligibleOrders }}</p>
-                        <p><em>Only orders with physical products, paid status, and shipping addresses will be imported.</em></p>
-                    </div>
                 </div>
 
                 <template #footer>
                     <span class="dialog-footer">
-                        <el-button @click="checkEligibleOrders" :loading="checking">
-                            Check Eligible Orders
-                        </el-button>
                         <el-button @click="showImportDialog = false">Cancel</el-button>
                         <el-button 
                             type="primary" 
                             @click="importShipments"
                             :loading="importing"
-                            :disabled="eligibleOrders === 0"
                         >
                             Import Shipments
                         </el-button>
@@ -413,17 +441,16 @@
 </template>
 
 <script type="text/javascript">
-import {Delete, Edit, Tickets, View} from "@element-plus/icons-vue";
+import {Delete, Edit, Search, Tickets, View} from "@element-plus/icons-vue";
 import MoreIcon from "@/components/icons/MoreIcon.vue";
 
 export default {
     name: 'Shipments',
-    components: {MoreIcon, Tickets, View, Edit, Delete},
+    components: {Search, MoreIcon, Tickets, View, Edit, Delete},
     data() {
         return {
             loading: false,
             importing: false,
-            checking: false,
             updating: false,
             bulkUpdating: false,
             loadingStats: false,
@@ -456,7 +483,6 @@ export default {
             // Selected data
             selectedShipment: null,
             trackingEvents: [],
-            eligibleOrders: null,
             activeTab: 'details',
             
             // Forms
@@ -477,11 +503,43 @@ export default {
                 status: '',
                 location: '',
                 description: ''
+            },
+
+            // Filter tabs
+            selectedMoreTab: '',
+            allTabs: {
+                '': 'All',
+                'processing': 'Processing',
+                'shipped': 'Shipped',
+                'delivered': 'Delivered',
+                'pending': 'Pending',
+                'in_transit': 'In Transit',
+                'out_for_delivery': 'Out for Delivery',
+                'failed': 'Failed',
+                'cancelled': 'Cancelled'
             }
         }
     },
+    computed: {
+        primaryTabs() {
+            const tabEntries = Object.entries(this.allTabs);
+            const firstFour = tabEntries.slice(0, 4);
+            return Object.fromEntries(firstFour);
+        },
+
+        moreTabs() {
+            const tabEntries = Object.entries(this.allTabs);
+            const excludedTabs = tabEntries.slice(4);
+            return Object.fromEntries(excludedTabs);
+        }
+    },
+
     mounted() {
         this.fetchShipments();
+        // Ensure the active bar positions correctly after mount
+        this.$nextTick(() => {
+            this.$forceUpdate();
+        });
     },
 
     beforeUnmount() {
@@ -844,55 +902,7 @@ export default {
             return multiline ? parts.join('\\n') : parts.join(', ');
         },
         
-        checkEligibleOrders() {
-            this.checking = true;
-            this.eligibleOrders = null;
-            
-            // Build filters object
-            const filters = {};
-            if (this.importForm.payment_status) {
-                filters.payment_status = this.importForm.payment_status;
-            }
-            if (this.importForm.order_status) {
-                filters.order_status = this.importForm.order_status;
-            }
-            if (this.importForm.date_from) {
-                filters.date_from = this.importForm.date_from;
-            }
-            if (this.importForm.date_to) {
-                filters.date_to = this.importForm.date_to;
-            }
-            
-            // Build request data
-            const requestData = {};
-            if (Object.keys(filters).length > 0) {
-                requestData.filters = filters;
-            }
-            
-            this.$post('shipments/import/fluent-cart', requestData)
-                .then(res => {
-                    if (res.success) {
-                        this.eligibleOrders = res.eligible_for_import;
-                        this.$notify({
-                            title: 'Check Complete',
-                            message: `Found ${res.eligible_for_import} orders eligible for import (${res.existing_shipments} already have shipments)`,
-                            type: 'info'
-                        });
-                    }
-                })
-                .catch(err => {
-                    this.$notifyError('Failed to check eligible orders: ' + err.message);
-                })
-                .finally(() => {
-                    this.checking = false;
-                });
-        },
-        
         importShipments() {
-            if (this.eligibleOrders === 0) {
-                this.$notifyError('No eligible orders to import');
-                return;
-            }
             
             this.importing = true;
             
@@ -931,7 +941,6 @@ export default {
                         
                         // Reset dialog
                         this.showImportDialog = false;
-                        this.eligibleOrders = null;
                         this.resetImportForm();
                         
                         // Refresh shipments list
@@ -955,6 +964,50 @@ export default {
                 date_from: '',
                 date_to: ''
             };
+        },
+
+        // Fluid Tab Methods
+        setActiveTab(status) {
+            this.filters.status = status;
+            this.selectedMoreTab = '';
+            this.pagination.page = 1;
+            this.fetchShipments();
+        },
+
+        handleMoreTabChange(status) {
+            this.filters.status = status;
+            this.pagination.page = 1;
+            this.fetchShipments();
+        },
+
+        getActiveTabPosition() {
+            if (!this.$refs.tabItems) return 0;
+            
+            const activeIndex = Object.keys(this.primaryTabs).indexOf(this.filters.status);
+            if (activeIndex === -1) {
+                // If active tab is in "More views", hide the active bar
+                return -9999;
+            }
+            
+            let position = 0;
+            for (let i = 0; i < activeIndex; i++) {
+                if (this.$refs.tabItems[i]) {
+                    position += this.$refs.tabItems[i].offsetWidth;
+                }
+            }
+            return position;
+        },
+
+        getActiveTabWidth() {
+            if (!this.$refs.tabItems) return 0;
+            
+            const activeIndex = Object.keys(this.primaryTabs).indexOf(this.filters.status);
+            if (activeIndex === -1 || !this.$refs.tabItems[activeIndex]) {
+                // If active tab is in "More views", hide the active bar
+                return 0;
+            }
+            
+            return this.$refs.tabItems[activeIndex].offsetWidth;
         }
     },
 

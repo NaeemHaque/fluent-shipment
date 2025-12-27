@@ -72,6 +72,26 @@ class ShipmentService
     }
 
     /**
+     * Map fluent-cart order status to shipment status
+     * 
+     * @param string $orderStatus
+     * @return string|null
+     */
+    public static function mapFluentCartOrderStatus($orderStatus)
+    {
+        $statusMap = [
+            'pending' => Shipment::STATUS_PENDING,
+            'processing' => Shipment::STATUS_PROCESSING,
+            'completed' => Shipment::STATUS_SHIPPED, // Completed orders can be marked as shipped
+            'cancelled' => Shipment::STATUS_CANCELLED,
+            'refunded' => Shipment::STATUS_CANCELLED,
+            'failed' => Shipment::STATUS_FAILED,
+        ];
+
+        return $statusMap[$orderStatus] ?? null;
+    }
+
+    /**
      * Map shipment status back to fluent-cart shipping status
      * 
      * @param string $shipmentStatus

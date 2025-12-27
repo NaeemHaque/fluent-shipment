@@ -19,6 +19,14 @@ $app->addAction('admin_menu', 'AdminMenuHandler');
 
 $app->addCustomAction('exception', 'ExceptionHandler');
 
+// Register FluentCart integration hooks
+$app->addAction('plugins_loaded', function() {
+    // Check if FluentCart is active before registering hooks
+    if (defined('FLUENT_CART_PLUGIN_VERSION')) {
+        \FluentShipment\App\Hooks\Handlers\FluentCartHookHandler::register();
+    }
+});
+
 /**
  * Enable this line if you want to use custom post types
  */

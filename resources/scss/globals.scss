@@ -174,9 +174,10 @@ html.dark .brand-logo {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 50px;
-    border-top: 1px solid var(--el-border-color);
-    border-bottom: 1px solid var(--el-border-color);
+    padding: 12px 20px;
+    height: 56px;
+    background: var(--fluentshipment-primary-bg);
+
 }
 
 .navbar-left,
@@ -298,4 +299,162 @@ html.dark {
 
 .capitalize {
     text-transform: capitalize;
+}
+
+/* ==============================
+   FLUID TAB STYLES (FluentCart Design)
+   ============================== */
+
+.fluent_shipment_filters_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.fluentshipment-fluid-tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    //border-radius: 6px;
+    padding: 4px;
+    overflow: hidden;
+    background: var(--fluentshipment-primary-bg);
+}
+
+
+.fluentshipment-fluid-tab-active-bar {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    bottom: 4px;
+    right: 4px;
+    background: var(--fluentshipment-active-bg);
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+html.dark .fluentshipment-fluid-tab-active-bar {
+    background: rgba(64, 158, 255, 0.15);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.fluentshipment-fluid-tab-item {
+    position: relative;
+    z-index: 2;
+    padding: 4px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+    border-radius: 4px;
+}
+
+html.dark .fluentshipment-fluid-tab-item {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.fluentshipment-fluid-tab-item:hover {
+    color: #333;
+}
+
+
+
+.fluentshipment-fluid-tab-item.more-views {
+    padding: 0;
+    background: transparent;
+    margin-left: 4px;
+}
+
+.fluentshipment-fluid-tab-item.more-views:hover {
+    background: transparent;
+}
+
+.more-views-select {
+    border: none !important;
+    box-shadow: none !important;
+    width: 120px !important;
+}
+
+.more-views-select .el-input__wrapper {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 4px 12px;
+}
+
+.more-views-select .el-input__inner {
+    color: #666;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+html.dark .more-views-select .el-input__inner {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.more-views-select:hover .el-input__inner {
+    color: #333;
+}
+
+html.dark .more-views-select:hover .el-input__inner {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.more-views-select .el-select__placeholder {
+    color: #666;
+    font-weight: 500;
+}
+
+html.dark .more-views-select .el-select__placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.fluent_shipment_filter {
+    min-width: 300px;
+}
+
+.fluent_shipment_filter .el-input__wrapper {
+    border-radius: 6px;
+}
+
+/* Dropdown styling */
+.more-views-dropdown {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--el-border-color);
+    background: var(--el-bg-panel);
+}
+
+.more-views-dropdown .el-select-dropdown__item {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--el-text-color-primary);
+}
+
+.more-views-dropdown .el-select-dropdown__item:hover {
+    background: var(--el-color-primary);
+    color: white;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .fluent_shipment_filters_wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .fluentshipment-fluid-tab {
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    .fluent_shipment_filter {
+        min-width: auto;
+        width: 100%;
+    }
 }
