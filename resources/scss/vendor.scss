@@ -1,189 +1,402 @@
-/* ==============================
-   ELEMENT PLUS CUSTOMIZATION
-   ============================== */
+@import "element-plus/theme-chalk/el-notification.css";
+@import "element-plus/theme-chalk/el-loading.css";
+@import "element-plus/theme-chalk/el-message-box.css";
+@import "element-plus/theme-chalk/dark/css-vars.css";
 
-/* ------------------------------
-   LIGHT & DARK THEMES
-   ------------------------------ */
+// customize element ui css here
+.toplevel_page_fluentshipment {
+    input {
+        color: var(--fluentshipment-secondary-text);
+    }
+    .el {
+        &-select {
+            width: 100%;
+            .el-select__wrapper {
+                background-color: transparent;
+                box-shadow: 0 0 0 1px var(--fluentshipment-primary-border) inset;
+            }
 
-.el-button--fluid {
-    width: 100% !important;
-}
+            input {
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                padding: 0 !important;
+            }
 
-/* ------------------------------
-   SELECTS
-   ------------------------------ */
-html.light .el-select,
-html.dark .el-select {
-    width: 100%;
-}
+            &-multiple {
+                input {
+                    height: 40px !important;
+                }
+            }
 
-html.light .el-select input,
-html.dark .el-select input {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    color: var(--el-text-color-primary);
-}
+            .el-input.is-focus {
+                input {
+                    &:focus {
+                        outline: none !important;
+                        box-shadow: none !important;
+                    }
+                }
+            }
 
-.el-select.is-focus input {
-    outline: none !important;
-    box-shadow: none !important;
-    border-color: var(--el-color-primary);
-}
+            &:hover,
+            &:focus {
+                .el-input {
+                    input {
+                        box-shadow: none !important;
+                    }
+                }
+            }
+        }
 
-/* ------------------------------
-   DIALOGS
-   ------------------------------ */
+        &-popper {
+            .el-select-dropdown__item.is-hovering {
+                background-color: var(--fluentshipment-primary-bg);
+            }
+            .el-popper__arrow:before {
+                //background: var(--fluentshipment-primary-bg) !important;
+                //border-color: var(--fluentshipment-primary-border) !important;
+            }
+        }
 
-.el-dialog .el-dialog__header {
-    display: block;
-    overflow: hidden;
-    background: var(--dialog-header-bg);
-    border: 1px solid var(--dialog-header-border);
-    padding: 15px;
-    margin: -20px -16px 20px;
-    border-radius: 5px 5px 0 0;
-}
+        .fluentshipment_tooltip_popper{
+            background: var(--fluentshipment-primary-bg) !important;
+            border: 1px solid var(--fluentshipment-primary-border) !important;
+            color: var(--fluentshipment-primary-text) !important;
+            max-width: 300px;
+            z-index: 9999 !important;
+        }
 
-.el-dialog .el-dialog__body {
-    padding: 15px 20px;
-}
+        &-tabs {
+            .el-tabs__header {
+                background-color: var(--fluentshipment-primary-bg);
+                border-bottom: 1px solid var(--fluentshipment-primary-border);
+                color: var(--fluentshipment-secondary-text);
+                .is-active {
+                    background: var(--fluentshipment-active-bg);
+                }
+            }
+            .el-tabs__nav-next, .el-tabs__nav-prev {
+                z-index: 99;
+                top: 9px;
+                bottom: unset;
+                height: 20px;
+                width: 20px;
+                background: var(--fluentshipment-primary-bg);
+                border: 1px solid var(--fluentshipment-primary-border);
+                color: var(--fluentshipment-primary-text);
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
 
-.el-dialog .el-dialog__headerbtn {
-    top: 0;
-    height: 46px;
-}
+        &-tag {
+            background-color: var(--fluentshipment-secondary-bg);
 
-.el-dialog .dialog-footer {
-    padding: 10px 20px;
-    text-align: right;
-    box-sizing: border-box;
-    background: var(--dialog-header-bg);
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    margin: 0 -16px -20px;
-}
+            &--success {
+                background-color: #f0f9ff;
+                border-color: #67C23A;
+                color: #529b2e;
+            }
 
-/* ------------------------------
-   INPUTS / TEXTAREAS / SELECTS / EL-INPUT
-   ------------------------------ */
+            &--danger {
+                background-color: #fef2f2;
+                border-color: #F56C6C;
+                color: #c45656;
+            }
+        }
 
-.el-input__wrapper {
-    padding: 0px !important;
-    border: none !important;
-    box-shadow: none !important;
-}
+        &-select__popper.el-popper {
+            background: var(--fluentshipment-primary-bg);
+            border: 1px solid var(--fluentshipment-primary-border);
+            &:hover {
+                background-color: var(--fluentshipment-primary-bg);
+                background: var(--fluentshipment-primary-bg);
+            }
+            ul:hover {
+                background-color: var(--fluentshipment-primary-bg);
+            }
+            li {
+                color: var(--fluentshipment-secondary-text);
+                &:hover {
+                    background-color: var(--fluentshipment-secondary-bg);
+                }
+            }
+        }
 
-input[type=checkbox]:focus,
-input[type=color]:focus,
-input[type=date]:focus,
-input[type=datetime-local]:focus,
-input[type=datetime]:focus,
-input[type=email]:focus,
-input[type=month]:focus,
-input[type=number]:focus,
-input[type=password]:focus,
-input[type=radio]:focus,
-input[type=search]:focus,
-input[type=tel]:focus,
-input[type=text]:focus,
-input[type=time]:focus,
-input[type=url]:focus,
-input[type=week]:focus,
-select:focus {
-    border-color: var(--el-color-primary);
-    box-shadow: none !important;
-    outline: 1px solid transparent
-}
+        &-radio-group {
+            .el-radio-button {
+                .el-radio-button__inner {
+                    color: var(--fluentshipment-primary-text, #19283a);
+                    padding: 8px 12px;
+                }
+            }
 
-input,
-textarea,
-select,
-.el-input__inner {
-    color: var(--el-text-color-primary);
-    background-color: var(--el-bg-panel);
-    border: 1px solid var(--el-border-color);
-    border-radius: 4px;
-    box-shadow: none;
-    padding: 6px 10px;
-    outline: none;
-}
+            .el-radio-button.is-active {
+                .el-radio-button__inner {
+                    //--el-radio-button-checked-bg-color: var(--fluentshipment-primary-bg)!important;
+                    background: var(--fluentshipment-primary-button) !important;
+                    color: var(--fluentshipment-primary-bg) !important;
+                }
+            }
+        }
 
-/* Remove inner focus shadow for el-input */
-.el-input.is-focus .el-input__inner {
-    border-color: var(--el-color-primary);
-    box-shadow: none;
-}
+        &-dialog {
+            padding: 0;
+            border-radius: 20px;
 
-/* Placeholder color */
-input::placeholder,
-textarea::placeholder,
-select::placeholder,
-.el-input__inner::placeholder {
-    color: var(--el-text-color-placeholder);
-    opacity: 1;
-}
+            &__header {
+                background: none;
+                border: none;
+                margin: 0;
+                padding: 20px 30px;
 
-/* ------------------------------
-   TAGS
-   ------------------------------ */
-.el-tag + .el-tag {
-    margin-left: 10px;
-}
+                .el-dialog__headerbtn {
+                    margin-top: 8px;
+                }
+            }
 
-.el-tag.el-tag--white {
-    background: white;
-    color: black;
-    border-color: white;
-}
 
-.el-tag.el-tag--white .el-tag__close {
-    color: #909399;
-}
+            &__footer {
+                padding: 16px 16px 16px 20px;
+                border-top: 1px solid var(--fluentshipment-primary-border);
+            }
 
-.el-tag.el-tag--white .el-tag__close:hover {
-    background-color: #909399;
-    color: #fff;
-}
+            &__body {
+                padding: 24px;
+                border-top: 1px solid var(--fluentshipment-primary-border);
+            }
 
-/* ------------------------------
-   POPOVERS
-   ------------------------------ */
-.el-popover {
-    padding: 10px;
-    text-align: left;
-}
+            --el-dialog-bg-color: var(--fluentshipment-primary-bg);
+        }
 
-.el-popover .action-buttons {
-    margin: 0;
-    text-align: center;
-}
+        &-form-item {
+            &__label {
+                padding: initial !important;
+            }
+        }
 
-/* ------------------------------
-   DROPDOWN MENUS
-   ------------------------------ */
-.el-dropdown-menu {
-    padding: 0 15px;
-    list-style: none;
-}
+        &-tag + &-tag {
+            margin-left: 10px;
+        }
 
-.el-dropdown-menu li {
-    margin: 10px 0;
-}
+        &-tag {
+            &--white {
+                background: white;
+                color: black;
+                border-color: white;
 
-/* ------------------------------
-   DATE RANGE SEPARATOR
-   ------------------------------ */
-.el-date-editor .el-range-separator {
-    width: auto;
-}
+                .el-tag__close {
+                    color: #909399;
 
-/* ------------------------------
-   RESPONSIVE DIALOGS
-   ------------------------------ */
-@media all and (max-width: 1000px) {
-    .el-dialog {
-        min-width: 80%;
+                    &:hover {
+                        background-color: #909399;
+                        color: #fff;
+                    }
+                }
+            }
+        }
+
+        &-popover {
+            padding: 10px;
+            text-align: left;
+
+            .action-buttons {
+                margin: 0;
+                text-align: center;
+            }
+        }
+
+        &-button {
+            &--mini {
+                padding: 4px;
+            }
+        }
+        &-radio-group {
+            border-left: 0px solid var(--fluentshipment-secondary-border) !important;
+            .el-radio-button__inner {
+                background-color: var(--fluentshipment-secondary-bg);
+                border-color: var(--fluentshipment-primary-border);
+                color: var(--fluentshipment-secondary-text);
+                border-left: 0px solid var(--fluentshipment-secondary-border) !important;
+            }
+            .el-radio-button.is-active
+            .el-radio-button__original-radio:not(:disabled)
+            + .el-radio-button__inner {
+                color: var(--fluentshipment-primary-bg);
+                border-left: 0px solid var(--fluentshipment-secondary-border) !important;
+            }
+        }
+
+        &-fluid {
+            width: 100% !important;
+        }
+
+        &-input,
+        &-textarea {
+            --el-input-text-color: var(--fluentshipment-secondary-text, #0e121b);
+            background-color: transparent;
+            --el-fill-color-blank: transparent;
+            --el-input-border-color: var(--fluentshipment-primary-border, #42464d);
+            --el-input-focus-border-color: var(--fluentshipment-secondary-border, #6b7280);
+        }
+
+        &-input__inner {
+            padding: 0 !important;
+            color: var(--fluentshipment-secondary-text, #0e121b);
+        }
+
+        &-overlay {
+            top: 32px;
+            &.is-message-box {
+                background: rgba(0, 0, 0, 0.5);
+            }
+            @media all and (max-width: 1000px) {
+                .el-dialog {
+                    min-width: 80%;
+                }
+            }
+        }
+
+        &-message-box {
+            background: var(--fluentshipment-primary-bg, #fff);
+            border-radius: 12px;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+            0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 0;
+
+            &__header {
+                display: none !important;
+            }
+
+            &__content {
+                display: flex;
+                padding: 20px;
+                align-items: flex-start;
+                gap: 16px;
+                background: var(--fluentshipment-primary-bg, #fff);
+                margin: 0;
+            }
+
+            &__status {
+                width: 48px;
+                height: 48px;
+                background: #fff1eb;
+                border-radius: 30%;
+                flex-shrink: 0;
+
+                &.el-message-box-icon--warning {
+                    color: #ff8447;
+                    font-size: 24px;
+                }
+            }
+
+            &__message {
+                p {
+                    font-size: 14px;
+                }
+            }
+
+            &__btns {
+                padding: 16px 20px;
+                gap: 12px;
+                border-top: 1px solid var(--fluentshipment-primary-border, #e1e4ea);
+
+                .el-button {
+                    padding: 8px 16px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    min-width: 80px;
+                    margin: 0;
+                    transition: all 0.2s ease;
+
+                    &:first-child,
+                    &--default {
+                        background: var(--fluentshipment-primary-bg, #fff);
+                        color: var(--fluentshipment-primary-text, #19283a);
+                        border: 1px solid #d1d5db;
+                    }
+                    &:hover {
+                        opacity: 0.7;
+                    }
+                    &--primary {
+                        border: 1px solid #FB3748;
+                        background: #FB374810;
+                        color: #FB3748
+                    }
+                }
+            }
+        }
+
+        &-dropdown__popper.el-popper {
+            background: var(--fluentshipment-primary-bg) !important;
+            border: 1px solid var(--fluentshipment-primary-border) !important;
+        }
+
+        &-notification {
+            background: var(--fluentshipment-primary-bg) !important;
+            border: 1px solid var(--fluentshipment-primary-border) !important;
+            color: var(--fluentshipment-primary-text) !important;
+            border-radius: 8px;
+        }
+        &-drawer {
+            &__header {
+                margin: 0;
+                padding: 1rem;
+                border-bottom: 1px solid var(--fluentshipment-primary-border, #e1e4ea);
+            }
+        }
+        &-checkbox {
+            .el-checkbox__inner{
+                border-radius: 4px;
+            }
+        }
+    }
+
+
+
+    .el-breadcrumb {
+        display: flex;
+        align-items: center;
+    }
+
+    .el-input {
+        input {
+            border: initial;
+            -webkit-transition: 0.2s;
+            -moz-transition: 0.2s;
+            -o-transition: 0.2s;
+            transition: 0.2s;
+            padding: inherit;
+            line-height: inherit;
+            min-height: inherit;
+            background: transparent;
+
+            &:hover,
+            &:focus {
+                outline: none;
+                box-shadow: none;
+            }
+
+            &:focus {
+                border-color: #3f9eff;
+            }
+        }
+    }
+
+    .fluentshipment_tooltip_popper {
+        background: var(--fluentshipment-primary-bg) !important;
+        border: 1px solid var(--fluentshipment-primary-border) !important;
+        color: var(--fluentshipment-primary-text) !important;
+        max-width: 350px;
+        z-index: 9999 !important;
+
+        .el-popper__arrow:before {
+            background: var(--fluentshipment-primary-bg) !important;
+            border-color: var(--fluentshipment-primary-border) !important;
+        }
     }
 }

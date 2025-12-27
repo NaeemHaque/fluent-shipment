@@ -1,3 +1,30 @@
 .fluent-shipment-wrapper {
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .page-header h3 {
+    margin: 0;
+    color: var(--fluentshipment-title-text-color);
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .page-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .page-content {
+    background: var(--fluentshipment-primary-bg);
+    border-radius: 8px;
+
+    .filters-section {
+      padding: 20px 12px;
+    }
+  }
 
 }

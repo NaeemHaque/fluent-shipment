@@ -1,0 +1,34 @@
+$slug: 'fluentshipment_';
+
+body {
+  --fluentshipment-primary-text: #19283a;
+  --fluentshipment-secondary-text: #525866;
+  --fluentshipment-title-text-color: #0E121B;
+  --fluentshipment-primary-button: #2B2E33;
+  --fluentshipment-primary-border: #d3d8de;
+  --fluentshipment-secondary-border: #9CA3AF;
+  --fluentshipment-primary-bg: #ffffff;
+  --fluentshipment-secondary-bg: #f0f2f5;
+  --fluentshipment-active-bg: #f0f3f5;
+  --el-color-primary: #19283a;
+  --el-button-color: #F0F3F5;
+  --fluentshipment-table-filter-text: #99A0AE;
+  --el-text-color-regular: var(--fluentshipment-secondary-text);
+}
+
+html.dark body {
+  --fluentshipment-primary-text: #F0F3F5;
+  --fluentshipment-secondary-text: #99A0AE;
+  --fluentshipment-title-text-color: #CFCFD5FF;
+  --fluentshipment-primary-button: #FFFFFF;
+  --fluentshipment-primary-border: #42464D;
+  --fluentshipment-secondary-border: #6b7280;
+  --fluentshipment-primary-bg: #141f2c;
+  --fluentshipment-secondary-bg: #11171d;
+  --fluentshipment-active-bg: #222f3d;
+  --el-color-primary: #F0F3F5;
+  --el-button-color: #19283a;
+  --el-border-color-hover: #42464D;
+  --el-border-color: #42464D;
+  --el-text-color-regular: var(--fluentshipment-secondary-text);
+}

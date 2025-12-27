@@ -13,174 +13,193 @@
                    </el-button>
                </div>
             </div>
-            <!-- Filters Section -->
-            <div class="filters-section">
-                <el-card>
-                    <div class="filters-row">
-                        <el-form :model="filters" :inline="true" class="filters-form">
-                            <el-form-item label="Status">
-                                <el-select v-model="filters.status" placeholder="All Statuses" clearable @change="fetchShipments">
-                                    <el-option label="Pending" value="pending"></el-option>
-                                    <el-option label="Processing" value="processing"></el-option>
-                                    <el-option label="Shipped" value="shipped"></el-option>
-                                    <el-option label="In Transit" value="in_transit"></el-option>
-                                    <el-option label="Out for Delivery" value="out_for_delivery"></el-option>
-                                    <el-option label="Delivered" value="delivered"></el-option>
-                                    <el-option label="Failed" value="failed"></el-option>
-                                    <el-option label="Cancelled" value="cancelled"></el-option>
-                                </el-select>
-                            </el-form-item>
-                            
-                            
-                            <el-form-item label="Search">
-                                <el-input 
-                                    v-model="filters.search" 
-                                    placeholder="Tracking number, email, order ID..." 
-                                    clearable 
-                                    @change="fetchShipments"
-                                ></el-input>
-                            </el-form-item>
-                            
-                            <el-form-item>
-                                <el-button @click="clearFilters">Clear</el-button>
-                            </el-form-item>
-                        </el-form>
-                    </div>
-                </el-card>
-            </div>
 
-            <div class="fluent_shipment_card">
-                <div class="table_wrap">
-                    <el-table
-                        :data="shipments"
-                        v-loading="loading"
-                        style="width:100%;"
-                        class="fluent_shipment_table"
-                        row-key="id"
-                    >
-                        <el-table-column type="selection" width="55" />
-                        <el-table-column prop="id" label="ID" width="80" sortable />
-                        
-                        <el-table-column prop="tracking_number" label="Tracking Number" width="150">
-                            <template #default="scope">
-                                <div style="display: flex; align-items: center;">
-                                    <span>{{ scope.row.tracking_number }}</span>
-                                    <el-button 
-                                        v-if="scope.row.tracking_url" 
-                                        type="text" 
-                                        size="small"
-                                        @click="openTrackingUrl(scope.row.tracking_url)"
-                                        style="margin-left: 8px;"
-                                    >
-                                        <i class="el-icon-link"></i>
-                                    </el-button>
-                                </div>
-                            </template>
-                        </el-table-column>
-                        
-                        <el-table-column prop="order_id" label="Order" width="100">
-                            <template #default="scope">
-                                <el-tag size="small">#{{ scope.row.order_id }}</el-tag>
-                            </template>
-                        </el-table-column>
-                        
-                        <el-table-column prop="current_status" label="Status" width="120">
-                            <template #default="scope">
-                                <el-tag :type="getStatusType(scope.row.current_status)" size="small">
-                                    {{ getStatusLabel(scope.row.current_status) }}
-                                </el-tag>
-                            </template>
-                        </el-table-column>
-                        
-                        
-                        <el-table-column prop="customer_email" label="Customer" width="200">
-                            <template #default="scope">
-                                <div>
-                                    <div>{{ scope.row.customer_email || 'N/A' }}</div>
-                                    <small style="color: #909399;">
-                                        {{ formatAddress(scope.row.delivery_address) }}
-                                    </small>
-                                </div>
-                            </template>
-                        </el-table-column>
-                        
-                        <el-table-column prop="estimated_delivery" label="Est. Delivery" width="120">
-                            <template #default="scope">
-                                {{ formatDate(scope.row.estimated_delivery) }}
-                            </template>
-                        </el-table-column>
-                        
-                        <el-table-column prop="created_at" label="Created" width="120">
-                            <template #default="scope">
-                                {{ formatDate(scope.row.created_at) }}
-                            </template>
-                        </el-table-column>
-                        
-                        <el-table-column label="Actions" width="180" fixed="right">
-                            <template #default="scope">
-                                <el-button-group>
-                                    <el-button size="small" @click="viewShipment(scope.row)">
-                                        <i class="el-icon-view"></i>
-                                    </el-button>
-                                    <el-button size="small" @click="editStatus(scope.row)">
-                                        <i class="el-icon-edit"></i>
-                                    </el-button>
-                                    <el-button 
-                                        size="small" 
-                                        type="danger"
-                                        @click="deleteShipment(scope.row)"
-                                    >
-                                        <i class="el-icon-delete"></i>
-                                    </el-button>
-                                </el-button-group>
-                            </template>
-                        </el-table-column>
-                    </el-table>
+            <div class="page-content">
+                <!-- Filters Section -->
+                <div class="fluent_shipment_card">
+                    <div class="fluent_shipment_card-header">
+                        <el-radio-group v-model="filters.status" @change="fetchShipments" class="fluentshipment_filter_btn_group">
+                            <el-radio-button value="">All</el-radio-button>
+                            <el-radio-button value="pending">Pending</el-radio-button>
+                            <el-radio-button value="processing">Processing</el-radio-button>
+                            <el-radio-button value="shipped">Shipped</el-radio-button>
+                            <el-radio-button value="in_transit">In Transit</el-radio-button>
+                            <el-radio-button value="out_for_delivery">Out for Delivery</el-radio-button>
+                            <el-radio-button value="delivered">Delivered</el-radio-button>
+                            <el-radio-button value="failed">Failed</el-radio-button>
+                            <el-radio-button value="cancelled">Cancelled</el-radio-button>
+                        </el-radio-group>
 
-                    <!-- Pagination -->
-                    <div class="pagination-wrapper">
-                        <div class="pagination-info">
-                            <span>Total: {{ pagination.total }} shipments</span>
-                            <span v-if="selectedRows.length > 0">Selected: {{ selectedRows.length }}</span>
+                        <div class="fluent_shipment_filter">
+                            <el-input v-model="filters.search" placeholder="Tracking number, email, order ID..." clearable/>
                         </div>
-                        
-                        <el-pagination
-                            v-model:current-page="pagination.page"
-                            v-model:page-size="pagination.per_page"
-                            :page-sizes="[10, 25, 50, 100]"
-                            :small="false"
-                            :background="true"
-                            layout="sizes, prev, pager, next, jumper"
-                            :total="pagination.total"
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                        />
                     </div>
 
-                    <!-- Bulk Actions -->
-                    <div class="bulk-actions" v-show="selectedRows.length > 0">
-                        <el-card>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span>{{ selectedRows.length }} selected</span>
-                                <el-button size="small" @click="bulkUpdateStatus">Update Status</el-button>
-                                <el-button size="small" @click="generateTrackingNumbers">Generate Tracking</el-button>
-                                <el-button size="small" type="danger" @click="bulkDelete">Delete</el-button>
+                    <div class="table_wrap">
+                        <el-table
+                            :data="shipments"
+                            v-loading="loading"
+                            style="width:100%;"
+                            class="fluent_shipment_table"
+                            row-key="id"
+                        >
+                            <el-table-column type="selection" width="55" />
+                            <el-table-column prop="id" label="ID" width="80" sortable />
+
+                            <el-table-column label="Product">
+                                <template #default="scope">
+                                    <div v-if="scope.row?.package_info">
+                                        <div v-for="item in scope.row.package_info?.items" :key="item.product_id">
+                                            {{ item.name }}
+                                        </div>
+                                    </div>
+                                </template>
+                            </el-table-column>
+
+                            <el-table-column prop="tracking_number" label="Tracking Number">
+                                <template #default="scope">
+                                    <div style="display: flex; align-items: center;">
+                                        <span>{{ scope.row.tracking_number }}</span>
+                                        <el-button
+                                            v-if="scope.row.tracking_url"
+                                            type="text"
+                                            size="small"
+                                            @click="openTrackingUrl(scope.row.tracking_url)"
+                                            style="margin-left: 8px;"
+                                        >
+                                            <i class="el-icon-link"></i>
+                                        </el-button>
+                                    </div>
+                                </template>
+                            </el-table-column>
+
+                            <el-table-column prop="order_id" label="Order" width="100">
+                                <template #default="scope">
+                                    <el-tag size="small">#{{ scope.row.order_id }}</el-tag>
+                                </template>
+                            </el-table-column>
+
+                            <el-table-column prop="current_status" label="Status" width="120">
+                                <template #default="scope">
+                                    <el-tag :type="getStatusType(scope.row.current_status)" size="small">
+                                        {{ getStatusLabel(scope.row.current_status) }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+
+
+                            <el-table-column prop="customer_email" label="Customer">
+                                <template #default="scope">
+                                    <div>
+                                        <div>{{ scope.row.customer_email || 'N/A' }}</div>
+                                        <small style="color: #909399;">
+                                            {{ formatAddress(scope.row.delivery_address) }}
+                                        </small>
+                                    </div>
+                                </template>
+                            </el-table-column>
+
+                            <el-table-column prop="estimated_delivery" label="Est. Delivery" width="120">
+                                <template #default="scope">
+                                    {{ formatDate(scope.row.estimated_delivery) }}
+                                </template>
+                            </el-table-column>
+
+                            <el-table-column prop="created_at" label="Created" width="120">
+                                <template #default="scope">
+                                    {{ formatDate(scope.row.created_at) }}
+                                </template>
+                            </el-table-column>
+
+                            <el-table-column align="right" width="80">
+                                <template #default="scope">
+                                    <el-dropdown trigger="click" popper-class="action-dropdown">
+                                        <span class="more-btn">
+                                            <el-icon>
+                                                <MoreIcon/>
+                                            </el-icon>
+                                        </span>
+                                        <template #dropdown>
+                                            <el-dropdown-menu>
+                                                <el-dropdown-item @click="viewShipment(scope.row)">
+                                                    <div class="dropdown-item">
+                                                        <el-icon size="20"><View /></el-icon>
+                                                        <span>Details</span>
+                                                    </div>
+                                                </el-dropdown-item>
+                                                <el-dropdown-item @click="editStatus(scope.row)">
+                                                    <div class="dropdown-item">
+                                                        <el-icon size="20">
+                                                            <Tickets />
+                                                        </el-icon>
+                                                        <span>Update Status</span>
+                                                    </div>
+                                                </el-dropdown-item>
+                                                <el-dropdown-item @click="deleteShipment(scope.row)">
+                                                    <div class="dropdown-item">
+                                                        <el-icon size="20">
+                                                            <Delete />
+                                                        </el-icon>
+                                                        <span>Delete</span>
+                                                    </div>
+                                                </el-dropdown-item>
+                                            </el-dropdown-menu>
+                                        </template>
+                                    </el-dropdown>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+                        <!-- Pagination -->
+                        <div class="pagination-wrapper">
+                            <div class="pagination-info">
+                                <span>Total: {{ pagination.total }} shipments</span>
+                                <span v-if="selectedRows.length > 0">Selected: {{ selectedRows.length }}</span>
                             </div>
-                        </el-card>
+
+                            <el-pagination
+                                v-model:current-page="pagination.page"
+                                v-model:page-size="pagination.per_page"
+                                :page-sizes="[10, 25, 50, 100]"
+                                :small="false"
+                                :background="true"
+                                layout="sizes, prev, pager, next, jumper"
+                                :total="pagination.total"
+                                @size-change="handleSizeChange"
+                                @current-change="handleCurrentChange"
+                            />
+                        </div>
+
+                        <!-- Bulk Actions -->
+                        <div class="bulk-actions" v-show="selectedRows.length > 0">
+                            <el-card>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span>{{ selectedRows.length }} selected</span>
+                                    <el-button size="small" @click="bulkUpdateStatus">Update Status</el-button>
+                                    <el-button size="small" @click="generateTrackingNumbers">Generate Tracking</el-button>
+                                    <el-button size="small" type="danger" @click="bulkDelete">Delete</el-button>
+                                </div>
+                            </el-card>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Import Dialog -->
             <el-dialog
-                title="Import Shipments from FluentCart"
                 v-model="showImportDialog"
                 width="600px"
                 :close-on-click-modal="false"
             >
+
+                <template #header>
+                    <div class="fluent_shipment_page_title">
+                        Import Shipments from FluentCart
+                    </div>
+                </template>
+
                 <div class="import-form">
                     <el-form :model="importForm" label-width="140px">
-                        
                         
                         <el-form-item label="Payment Status">
                             <el-select v-model="importForm.payment_status" placeholder="Filter by payment status">
@@ -224,7 +243,7 @@
                         <p><em>Only orders with physical products, paid status, and shipping addresses will be imported.</em></p>
                     </div>
                 </div>
-                
+
                 <template #footer>
                     <span class="dialog-footer">
                         <el-button @click="checkEligibleOrders" :loading="checking">
@@ -394,8 +413,12 @@
 </template>
 
 <script type="text/javascript">
+import {Delete, Edit, Tickets, View} from "@element-plus/icons-vue";
+import MoreIcon from "@/components/icons/MoreIcon.vue";
+
 export default {
     name: 'Shipments',
+    components: {MoreIcon, Tickets, View, Edit, Delete},
     data() {
         return {
             loading: false,
@@ -408,6 +431,7 @@ export default {
             
             shipments: [],
             selectedRows: [],
+            searchTimeout: null,
             
             pagination: {
                 page: 1,
@@ -459,7 +483,23 @@ export default {
     mounted() {
         this.fetchShipments();
     },
+
+    beforeUnmount() {
+        // Clear timeout to prevent memory leaks
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+        }
+    },
     methods: {
+        // Debounced search method
+        debounceSearch() {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.pagination.page = 1; // Reset to first page when searching
+                this.fetchShipments();
+            }, 300);
+        },
+
         fetchShipments() {
             this.loading = true;
             
@@ -479,12 +519,19 @@ export default {
             this.$get('shipments', params)
                 .then(res => {
                     if (res.data && res.data.data) {
-                        this.shipments = res.data.data;
-                        this.pagination.total = res.data.total;
-                        this.pagination.page = res.data.current_page;
-                        this.pagination.per_page = res.data.per_page;
+                        this.shipments = res.data.data || [];
+                        this.pagination.total = parseInt(res.data.total) || 0;
+                        this.pagination.page = parseInt(res.data.current_page) || 1;
+                        this.pagination.per_page = parseInt(res.data.per_page) || 25;
+                    } else if (res.success && res.data) {
+                        // Handle Laravel pagination response format
+                        this.shipments = res.data.data || [];
+                        this.pagination.total = parseInt(res.data.total) || 0;
+                        this.pagination.page = parseInt(res.data.current_page) || 1;
+                        this.pagination.per_page = parseInt(res.data.per_page) || 25;
                     } else {
-                        this.shipments = res.shipments || [];
+                        this.shipments = [];
+                        this.pagination.total = 0;
                     }
                 })
                 .catch(err => {
@@ -497,26 +544,13 @@ export default {
 
         // Pagination handlers
         handleSizeChange(newSize) {
-            this.pagination.per_page = newSize;
+            this.pagination.per_page = parseInt(newSize) || 25;
             this.pagination.page = 1;
             this.fetchShipments();
         },
 
         handleCurrentChange(newPage) {
-            this.pagination.page = newPage;
-            this.fetchShipments();
-        },
-
-        // Filter handlers
-        clearFilters() {
-            this.filters = {
-                status: '',
-                search: '',
-                order_source: '',
-                date_from: '',
-                date_to: ''
-            };
-            this.pagination.page = 1;
+            this.pagination.page = parseInt(newPage) || 1;
             this.fetchShipments();
         },
 
@@ -924,96 +958,16 @@ export default {
         }
     },
 
+    watch: {
+        'filters.search': {
+            handler(newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    this.debounceSearch();
+                }
+            },
+            immediate: false
+        }
+    }
+
 };
 </script>
-
-<style scoped>
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 0 0 15px 0;
-    border-bottom: 1px solid #ebeef5;
-}
-
-.page-header h3 {
-    margin: 0;
-    color: #303133;
-    font-size: 24px;
-    font-weight: 500;
-}
-
-.page-actions {
-    display: flex;
-    gap: 12px;
-}
-
-.import-form {
-    margin-bottom: 20px;
-}
-
-.import-info {
-    background-color: #f0f9ff;
-    border: 1px solid #b8e6ff;
-    border-radius: 6px;
-    padding: 15px;
-    margin-top: 20px;
-}
-
-.import-info p {
-    margin: 0 0 8px 0;
-    color: #1f2937;
-}
-
-.import-info em {
-    color: #6b7280;
-    font-size: 14px;
-}
-
-.dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-}
-
-.fluent_shipment_card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.table_wrap {
-    padding: 0;
-}
-
-.fluent_shipment_table {
-    border-radius: 0;
-}
-
-/* Button styling */
-.el-button--primary {
-    background-color: #409eff;
-    border-color: #409eff;
-}
-
-.el-button--primary:hover {
-    background-color: #66b1ff;
-    border-color: #66b1ff;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
-    
-    .page-actions {
-        width: 100%;
-        justify-content: flex-end;
-    }
-}
-</style>
