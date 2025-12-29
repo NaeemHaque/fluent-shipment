@@ -11,7 +11,10 @@ const pluginFolder = path.basename(__dirname);
 const inputs = [
     'resources/admin/app.js',
     'resources/admin/start.js',
-    'resources/scss/admin.scss'
+    'resources/scss/admin.scss',
+    'public/js/public-tracking.js',
+    'public/css/public-tracking.css',
+    'public/css/fluent-cart-tracking.css'
 ];
 
 export default defineConfig(({ mode }) => {
