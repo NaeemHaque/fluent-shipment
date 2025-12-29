@@ -203,27 +203,15 @@
                                 </template>
                             </el-table-column>
                         </el-table>
+                    </div>
 
-                        <!-- Pagination -->
-                        <div class="pagination-wrapper">
-                            <div class="pagination-info">
-                                <span>Total: {{ pagination.total }} shipments</span>
-                                <span v-if="selectedRows.length > 0">Selected: {{ selectedRows.length }}</span>
-                            </div>
-
-                            <el-pagination
-                                v-model:current-page="pagination.page"
-                                v-model:page-size="pagination.per_page"
-                                :page-sizes="[10, 25, 50, 100]"
-                                :small="false"
-                                :background="true"
-                                layout="sizes, prev, pager, next, jumper"
-                                :total="pagination.total"
-                                @size-change="handleSizeChange"
-                                @current-change="handleCurrentChange"
-                            />
-                        </div>
-
+                    <!-- Pagination -->
+                    <div class="fluent_shipment_card-footer">
+                        <Pagination 
+                            :pagination="pagination" 
+                            @update:pagination="updatePagination" 
+                            @per_page_change="handleSizeChange"
+                        />
                     </div>
                 </div>
             </div>
@@ -450,10 +438,11 @@
 <script type="text/javascript">
 import {Delete, Edit, Search, Tickets, View} from "@element-plus/icons-vue";
 import MoreIcon from "@/components/icons/MoreIcon.vue";
+import Pagination from "@/pieces/Pagination.vue";
 
 export default {
     name: 'Shipments',
-    components: {Search, MoreIcon, Tickets, View, Edit, Delete},
+    components: {Pagination, Search, MoreIcon, Tickets, View, Edit, Delete},
     data() {
         return {
             loading: false,
@@ -468,8 +457,8 @@ export default {
             searchTimeout: null,
             
             pagination: {
-                page: 1,
-                per_page: 25,
+                current_page: 1,
+                per_page: 10,
                 total: 0
             },
             
@@ -560,7 +549,7 @@ export default {
         debounceSearch() {
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(() => {
-                this.pagination.page = 1; // Reset to first page when searching
+                this.pagination.current_page = 1; // Reset to first current_page when searching
                 this.fetchShipments();
             }, 300);
         },
@@ -570,7 +559,7 @@ export default {
             
             // Build query parameters
             const params = {
-                page: this.pagination.page,
+                page: this.pagination.current_page,
                 per_page: this.pagination.per_page
             };
             
@@ -586,14 +575,14 @@ export default {
                     if (res.data && res.data.data) {
                         this.shipments = res.data.data || [];
                         this.pagination.total = parseInt(res.data.total) || 0;
-                        this.pagination.page = parseInt(res.data.current_page) || 1;
-                        this.pagination.per_page = parseInt(res.data.per_page) || 25;
+                        this.pagination.current_page = parseInt(res.data.current_page) || 1;
+                        this.pagination.per_page = parseInt(res.data.per_page) || 10;
                     } else if (res.success && res.data) {
                         // Handle Laravel pagination response format
                         this.shipments = res.data.data || [];
                         this.pagination.total = parseInt(res.data.total) || 0;
-                        this.pagination.page = parseInt(res.data.current_page) || 1;
-                        this.pagination.per_page = parseInt(res.data.per_page) || 25;
+                        this.pagination.current_page = parseInt(res.data.current_page) || 1;
+                        this.pagination.per_page = parseInt(res.data.per_page) || 10;
                     } else {
                         this.shipments = [];
                         this.pagination.total = 0;
@@ -608,14 +597,19 @@ export default {
         },
 
         // Pagination handlers
+        updatePagination(newPagination) {
+            this.pagination = { ...this.pagination, ...newPagination };
+            this.fetchShipments();
+        },
+
         handleSizeChange(newSize) {
-            this.pagination.per_page = parseInt(newSize) || 25;
-            this.pagination.page = 1;
+            this.pagination.per_page = parseInt(newSize) || 10;
+            this.pagination.current_page = 1;
             this.fetchShipments();
         },
 
         handleCurrentChange(newPage) {
-            this.pagination.page = parseInt(newPage) || 1;
+            this.pagination.current_page = parseInt(newPage) || 1;
             this.fetchShipments();
         },
 
@@ -699,7 +693,7 @@ export default {
                     type: 'warning',
                 }
             ).then(() => {
-                this.$delete(`shipments/${shipment.id}`)
+                this.$del(`shipments/${shipment.id}`)
                     .then(res => {
                         if (res.success) {
                             this.$notify({
@@ -785,7 +779,7 @@ export default {
             ).then(() => {
                 // Delete each shipment
                 const promises = this.selectedRows.map(row => 
-                    this.$delete(`shipments/${row.id}`)
+                    this.$del(`shipments/${row.id}`)
                 );
 
                 Promise.all(promises)
@@ -951,13 +945,13 @@ export default {
         setActiveTab(status) {
             this.filters.status = status;
             this.selectedMoreTab = '';
-            this.pagination.page = 1;
+            this.pagination.current_page = 1;
             this.fetchShipments();
         },
 
         handleMoreTabChange(status) {
             this.filters.status = status;
-            this.pagination.page = 1;
+            this.pagination.current_page = 1;
             this.fetchShipments();
         },
 

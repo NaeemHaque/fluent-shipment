@@ -98,18 +98,11 @@ export default {
     },
     mounted() {
         this.registerRestRequestInterceptor();
-        
-        // Debug: Log menu data
-        if (typeof __DEV__ !== 'undefined' && __DEV__) {
-            console.log('Application mounted - Primary Menu:', this.primaryMenu);
-            console.log('Application mounted - All Menus:', menu.all());
-        }
     },
     watch: {
         primaryMenu: {
             handler(newVal) {
                 if (typeof __DEV__ !== 'undefined' && __DEV__) {
-                    console.log('Primary menu updated:', newVal);
                 }
             },
             immediate: true

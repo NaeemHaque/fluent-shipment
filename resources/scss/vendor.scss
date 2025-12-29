@@ -10,8 +10,8 @@
     }
     .el {
         &-select {
-            width: 100%;
             .el-select__wrapper {
+                width: 100%;
                 background-color: transparent;
                 box-shadow: 0 0 0 1px var(--fluentshipment-primary-border) inset;
             }
@@ -211,6 +211,11 @@
         &-button {
             &--mini {
                 padding: 4px;
+            }
+            &--primary {
+                background: var(--fluentshipment-primary-button);
+                border: 1px solid var(--fluentshipment-primary-button);
+                color: white;
             }
         }
         &-radio-group {

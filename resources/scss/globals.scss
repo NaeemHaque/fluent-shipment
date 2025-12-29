@@ -414,21 +414,17 @@ html.dark .fluentshipment-fluid-tab-item {
     width: 120px !important;
 }
 
-.more-views-select .el-input__wrapper {
+.more-views-select .el-select__wrapper {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     padding: 4px 12px;
 }
 
-.more-views-select .el-input__inner {
+.more-views-select .el-select__wrapper {
     color: #666;
     font-weight: 500;
     font-size: 14px;
-}
-
-html.dark .more-views-select .el-input__inner {
-    color: rgba(255, 255, 255, 0.6);
 }
 
 .more-views-select:hover .el-input__inner {
