@@ -27,6 +27,12 @@ $app->addAction('plugins_loaded', function() {
     }
 });
 
+// Register public shortcode
+$app->addAction('init', function() {
+    $trackingShortcode = new \FluentShipment\App\Shortcodes\TrackingShortcode();
+    $trackingShortcode->register();
+});
+
 /**
  * Enable this line if you want to use custom post types
  */

@@ -120,22 +120,23 @@ class ShipmentController extends Controller
         $statusClass = '\FluentCart\App\Helpers\Status';
         $orderClass = '\FluentCart\App\Models\Order';
 
-        // Build query for eligible orders
+        // Build base query for eligible orders
         $query = $orderClass::with(['shipping_address', 'customer', 'order_items'])
             ->where('fulfillment_type', $statusClass::FULFILLMENT_TYPE_PHYSICAL)
-            ->whereIn('payment_status', [$statusClass::PAYMENT_PAID, $statusClass::PAYMENT_PARTIALLY_PAID])
-            ->whereIn('status', [$statusClass::ORDER_PROCESSING, $statusClass::ORDER_COMPLETED])
             ->whereHas('shipping_address')
             ->where('shipping_status', '!=', $statusClass::SHIPPING_UNSHIPPABLE);
 
-        // Apply additional filters
-        if (!empty($filters['order_status'])) {
-            $query->where('status', $filters['order_status']);
-        }
-
+        // Apply payment status filter - only if specified
         if (!empty($filters['payment_status'])) {
             $query->where('payment_status', $filters['payment_status']);
         }
+        // If no payment status filter is provided, import ALL orders regardless of payment status
+
+        // Apply order status filter - only if specified  
+        if (!empty($filters['order_status'])) {
+            $query->where('status', $filters['order_status']);
+        }
+        // If no order status filter is provided, import ALL orders regardless of order status
 
         if (!empty($filters['shipping_status'])) {
             $query->where('shipping_status', $filters['shipping_status']);

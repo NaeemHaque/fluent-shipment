@@ -1,0 +1,469 @@
+/* ============================
+   Fluent Shipment Public Tracking
+   ============================ */
+
+/* Reset & Base Styles */
+.fluent-shipment-tracking {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header */
+.fs-tracking-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.fs-tracking-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+/* Search Form */
+.fs-tracking-search {
+    margin-bottom: 30px;
+}
+
+.fs-search-form {
+    display: flex;
+    justify-content: center;
+}
+
+.fs-search-input-group {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    border: 2px solid #e1e8ed;
+    transition: border-color 0.3s ease;
+}
+
+.fs-search-input-group:focus-within {
+    border-color: #3498db;
+}
+
+.fs-search-input {
+    flex: 1;
+    padding: 15px 20px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
+}
+
+.fs-search-input::placeholder {
+    color: #95a5a6;
+}
+
+.fs-search-button {
+    padding: 15px 25px;
+    background: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    min-width: 120px;
+}
+
+.fs-search-button:hover {
+    background: #2980b9;
+}
+
+.fs-search-button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.fs-search-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Error State */
+.fs-tracking-error {
+    background: #fdf2f2;
+    border: 1px solid #fecdd3;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.fs-error-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.fs-tracking-error h3 {
+    color: #dc2626;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.fs-tracking-error p {
+    color: #7f1d1d;
+    margin: 8px 0;
+}
+
+/* Success State */
+.fs-tracking-success {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+/* Shipment Header */
+.fs-shipment-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px 30px;
+}
+
+.fs-shipment-title {
+    font-size: 1.3rem;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.fs-tracking-number {
+    font-family: "Courier New", monospace;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.fs-current-status {
+    margin-top: 15px;
+}
+
+.fs-status-label {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status Colors */
+.status-pending { background: #f39c12; color: white; }
+.status-processing { background: #3498db; color: white; }
+.status-shipped { background: #9b59b6; color: white; }
+.status-transit { background: #16a085; color: white; }
+.status-delivery { background: #e67e22; color: white; }
+.status-delivered { background: #27ae60; color: white; }
+.status-failed { background: #e74c3c; color: white; }
+.status-cancelled { background: #95a5a6; color: white; }
+.status-returned { background: #f39c12; color: white; }
+.status-exception { background: #e74c3c; color: white; }
+.status-default { background: #bdc3c7; color: white; }
+
+/* Shipment Details */
+.fs-shipment-details {
+    padding: 25px 30px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.fs-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.fs-detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.fs-detail-item.fs-detail-full {
+    grid-column: 1 / -1;
+}
+
+.fs-detail-item label {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.fs-detail-item span {
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+/* Tracking Timeline */
+.fs-tracking-timeline {
+    padding: 30px;
+}
+
+.fs-timeline-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 25px 0;
+    text-align: center;
+}
+
+.fs-timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.fs-timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.fs-timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.fs-timeline-marker {
+    position: absolute;
+    left: -20px;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.fs-timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #bdc3c7;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #bdc3c7;
+    z-index: 2;
+}
+
+.fs-timeline-current .fs-timeline-dot {
+    background: #3498db;
+    box-shadow: 0 0 0 2px #3498db;
+    animation: pulse 2s infinite;
+}
+
+.fs-timeline-milestone .fs-timeline-dot {
+    background: #27ae60;
+    box-shadow: 0 0 0 2px #27ae60;
+    width: 20px;
+    height: 20px;
+}
+
+.fs-timeline-line {
+    width: 2px;
+    height: 40px;
+    background: #e9ecef;
+    margin-top: 8px;
+}
+
+.fs-timeline-content {
+    padding-left: 30px;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-left: 3px solid #e9ecef;
+}
+
+.fs-timeline-current .fs-timeline-content {
+    border-left-color: #3498db;
+    background: #f8fbff;
+}
+
+.fs-timeline-milestone .fs-timeline-content {
+    border-left-color: #27ae60;
+    background: #f0fff4;
+}
+
+.fs-timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.fs-timeline-status {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.fs-timeline-date {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.fs-timeline-description {
+    color: #555;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.fs-timeline-location {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* Loading States */
+.fs-tracking-loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.fs-loading-content {
+    display: inline-block;
+}
+
+.fs-spinner,
+.fs-spinner-large {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 1s ease-in-out infinite;
+}
+
+.fs-spinner-large {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+    margin-bottom: 15px;
+}
+
+/* Footer */
+.fs-tracking-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.fs-powered-by {
+    color: #95a5a6;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Animations */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 2px #3498db, 0 0 0 0 rgba(52, 152, 219, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 2px #3498db, 0 0 0 10px rgba(52, 152, 219, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 2px #3498db, 0 0 0 0 rgba(52, 152, 219, 0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .fluent-shipment-tracking {
+        padding: 15px;
+    }
+    
+    .fs-tracking-title {
+        font-size: 1.6rem;
+    }
+    
+    .fs-search-input-group {
+        flex-direction: column;
+    }
+    
+    .fs-search-button {
+        border-radius: 0 0 8px 8px;
+        margin-top: -1px;
+    }
+    
+    .fs-shipment-header {
+        padding: 20px;
+    }
+    
+    .fs-shipment-details {
+        padding: 20px;
+    }
+    
+    .fs-detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .fs-timeline-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .fs-timeline-content {
+        padding: 15px;
+    }
+    
+    .fs-tracking-timeline {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .fs-search-input,
+    .fs-search-button {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+    
+    .fs-shipment-title {
+        font-size: 1.2rem;
+    }
+    
+    .fs-tracking-number {
+        display: block;
+        margin-top: 5px;
+    }
+}
+
+/* WordPress Theme Compatibility */
+.fluent-shipment-tracking * {
+    box-sizing: border-box;
+}
+
+.fluent-shipment-tracking h2,
+.fluent-shipment-tracking h3,
+.fluent-shipment-tracking h4 {
+    margin-top: 0;
+}
+
+.fluent-shipment-tracking p {
+    margin: 1em 0;
+}
+
+.fluent-shipment-tracking input,
+.fluent-shipment-tracking button {
+    font-family: inherit;
+}
