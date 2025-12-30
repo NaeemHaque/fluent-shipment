@@ -142,6 +142,8 @@ html.dark {
 .brand-logo img {
     outline: none;
     padding: 2px 0;
+    width: 60px;
+    height: auto;
 }
 
 .brand-logo a {
@@ -185,12 +187,8 @@ html.dark .brand-logo {
     align-items: center;
 }
 
-.navbar-left {
-    gap: 24px;
-}
-
 .navbar-right {
-    gap: 16px;
+    gap: 8px;
 }
 
 .menu {
