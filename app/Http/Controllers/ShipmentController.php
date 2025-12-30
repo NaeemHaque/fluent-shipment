@@ -13,20 +13,18 @@ class ShipmentController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage = min($request->get('per_page', 15), 100); // Cap at 100
-        $page    = $request->get('page', 1);
+        $perPage = min($request->getSafe('per_page', 'intval', 15), 100); // Cap at 100
+        $page    = $request->getSafe('page', 'intval', 1);
 
-        // Filters
-        $status         = $request->get('status');
-        $orderSource    = $request->get('order_source');
-        $trackingNumber = $request->get('tracking_number');
-        $customerEmail  = $request->get('customer_email');
-        $dateFrom       = $request->get('date_from');
-        $dateTo         = $request->get('date_to');
-        $search         = $request->get('search');
+        $status         = $request->getSafe('status', 'sanitize_text_field');
+        $orderSource    = $request->getSafe('order_source', 'sanitize_text_field');
+        $trackingNumber = $request->getSafe('tracking_number', 'sanitize_text_field');
+        $customerEmail  = $request->getSafe('customer_email', 'sanitize_email');
+        $dateFrom       = $request->getSafe('date_from', 'sanitize_text_field');
+        $dateTo         = $request->getSafe('date_to', 'sanitize_text_field');
+        $search         = $request->getSafe('search', 'sanitize_text_field');
 
-        // Include relationships
-        $with        = $request->get('with', []);
+        $with        = $request->getSafe('with', 'fluentShipmentSanitizeArray', []);
         $allowedWith = ['trackingEvents', 'latestTrackingEvent', 'rider'];
         $with        = array_intersect((array)$with, $allowedWith);
 
@@ -109,8 +107,8 @@ class ShipmentController extends Controller
             'options' => 'array',
         ]);
 
-        $filters = $request->get('filters', []);
-        $options = $request->get('options', []);
+        $filters = $request->getSafe('filters', 'fluentShipmentSanitizeArray', []);
+        $options = $request->getSafe('options', 'fluentShipmentSanitizeArray', []);
 
         // Get fluent-cart status constants
         $statusClass = '\FluentCart\App\Helpers\Status';
@@ -212,12 +210,12 @@ class ShipmentController extends Controller
         }
 
         $options = [
-            'carrier' => $request->get('carrier', Shipment::CARRIER_CUSTOM),
-            'service' => $request->get('service', 'standard'),
+            'carrier' => $request->getSafe('carrier', 'sanitize_text_field', Shipment::CARRIER_CUSTOM),
+            'service' => $request->getSafe('service', 'sanitize_text_field', 'standard'),
         ];
 
-        if ($request->get('estimated_delivery')) {
-            $options['estimated_delivery'] = $request->get('estimated_delivery');
+        if ($request->getSafe('estimated_delivery', 'sanitize_text_field')) {
+            $options['estimated_delivery'] = $request->getSafe('estimated_delivery', 'sanitize_text_field');
         }
 
         $shipment = ShipmentService::createFromFluentCartOrder($order, $options);
@@ -248,11 +246,11 @@ class ShipmentController extends Controller
 
         $shipment = Shipment::findOrFail($id);
 
-        $newStatus   = $request->get('status');
-        $location    = $request->get('location');
-        $description = $request->get('description');
-        $riderId     = $request->get('rider_id');
-        $syncToOrder = $request->get('sync_to_order', true);
+        $newStatus   = $request->getSafe('status', 'sanitize_text_field');
+        $location    = $request->getSafe('location', 'sanitize_text_field');
+        $description = $request->getSafe('description', 'sanitize_text_field');
+        $riderId     = $request->getSafe('rider_id' , 'intval');
+        $syncToOrder = $request->getSafe('sync_to_order', 'rest_sanitize_boolean', true);
 
         if ($newStatus === Shipment::STATUS_OUT_FOR_DELIVERY && $riderId) {
             $shipment->rider_id = $riderId;
@@ -264,7 +262,6 @@ class ShipmentController extends Controller
             }
         }
 
-        // Update shipment status
         $eventData = array_filter([
             'location'    => $location,
             'description' => $description,
@@ -302,14 +299,14 @@ class ShipmentController extends Controller
         $shipment = Shipment::findOrFail($id);
 
         $oldTrackingNumber         = $shipment->tracking_number;
-        $shipment->tracking_number = $request->get('tracking_number');
+        $shipment->tracking_number = $request->getSafe('tracking_number', 'sanitize_text_field');
 
         if ($request->get('carrier')) {
-            $shipment->carrier = $request->get('carrier');
+            $shipment->carrier = $request->getSafe('carrier', 'sanitize_text_field');
         }
 
         if ($request->get('tracking_url')) {
-            $shipment->tracking_url = $request->get('tracking_url');
+            $shipment->tracking_url = $request->getSafe('tracking_url', 'sanitize_url');
         }
 
         $shipment->save();
@@ -372,13 +369,13 @@ class ShipmentController extends Controller
         $shipment = Shipment::findOrFail($id);
 
         $eventData = [
-            'description'  => $request->get('description') ?? Shipment::getStatusLabels()[$request->get('status')],
-            'location'     => $request->get('location'),
-            'date'         => $request->get('event_date') ?? DateTimeHelper::now(),
-            'is_milestone' => $request->get('is_milestone', Shipment::isMilestoneStatus($request->get('status'))),
+            'description'  => $request->getSafe('description', 'sanitize_text_field') ?? Shipment::getStatusLabels()[$request->getSafe('status', 'sanitize_text_field')],
+            'location'     => $request->getSafe('location', 'sanitize_text_field'),
+            'date'         => $request->getSafe('event_date', 'sanitize_text_field') ?? DateTimeHelper::now(),
+            'is_milestone' => $request->getSafe('is_milestone', 'rest_sanitize_boolean', Shipment::isMilestoneStatus($request->getSafe('status', 'sanitize_text_field'))),
         ];
 
-        $event = $shipment->createTrackingEvent($request->get('status'), $eventData);
+        $event = $shipment->createTrackingEvent($request->getSafe('status', 'sanitize_text_field'), $eventData);
 
         return [
             'success' => true,
@@ -389,8 +386,8 @@ class ShipmentController extends Controller
 
     public function stats(Request $request)
     {
-        $dateFrom = $request->get('date_from');
-        $dateTo   = $request->get('date_to');
+        $dateFrom = $request->getSafe('date_from', 'sanitize_text_field');
+        $dateTo   = $request->getSafe('date_to', 'sanitize_text_field');
 
         $query = Shipment::query();
 
@@ -464,10 +461,10 @@ class ShipmentController extends Controller
             'description'    => 'string|max:500',
         ]);
 
-        $shipmentIds = $request->get('shipment_ids');
-        $status      = $request->get('status');
-        $location    = $request->get('location');
-        $description = $request->get('description');
+        $shipmentIds = $request->getSafe('shipment_ids', 'fluentShipmentSanitizeIds');
+        $status      = $request->getSafe('status', 'sanitize_text_field');
+        $location    = $request->getSafe('location', 'sanitize_text_field');
+        $description = $request->getSafe('description', 'sanitize_text_field');
 
         $shipments = Shipment::whereIn('id', $shipmentIds)->get();
 

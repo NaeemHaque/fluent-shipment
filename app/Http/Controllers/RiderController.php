@@ -10,15 +10,14 @@ class RiderController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage = min($request->get('per_page', 15), 100); // Cap at 100
-        $page    = $request->get('page', 1);
+        $perPage = min($request->getSafe('per_page', 'intval', 15), 100);
+        $page    = $request->getSafe('page', 'intval', 1);
 
-        // Filters
-        $status      = $request->get('status');
-        $vehicleType = $request->get('vehicle_type');
-        $search      = $request->get('search');
-        $dateFrom    = $request->get('date_from');
-        $dateTo      = $request->get('date_to');
+        $status      = $request->getSafe('status', 'sanitize_text_field');
+        $vehicleType = $request->getSafe('vehicle_type', 'sanitize_text_field');
+        $search      = $request->getSafe('search', 'sanitize_text_field');
+        $dateFrom    = $request->getSafe('date_from', 'sanitize_text_field');
+        $dateTo      = $request->getSafe('date_to', 'sanitize_text_field');
 
         $query = Rider::query();
 
@@ -81,17 +80,17 @@ class RiderController extends Controller
         ]);
 
         $riderData = [
-            'rider_name'            => $request->get('rider_name'),
-            'email'                 => $request->get('email'),
-            'phone'                 => $request->get('phone'),
-            'license_number'        => $request->get('license_number'),
-            'vehicle_type'          => $request->get('vehicle_type', Rider::VEHICLE_BIKE),
-            'vehicle_number'        => $request->get('vehicle_number'),
-            'status'                => $request->get('status', Rider::STATUS_ACTIVE),
-            'joining_date'          => $request->get('joining_date') ?: DateTimeHelper::now(),
-            'address'               => $request->get('address'),
-            'emergency_contact'     => $request->get('emergency_contact'),
-            'notes'                 => $request->get('notes'),
+            'rider_name'            => $request->getSafe('rider_name', 'sanitize_text_field'),
+            'email'                 => $request->getSafe('email', 'sanitize_email'),
+            'phone'                 => $request->getSafe('phone', 'sanitize_text_field'),
+            'license_number'        => $request->getSafe('license_number', 'sanitize_text_field'),
+            'vehicle_type'          => $request->getSafe('vehicle_type', 'sanitize_text_field', Rider::VEHICLE_BIKE),
+            'vehicle_number'        => $request->getSafe('vehicle_number', 'sanitize_text_field'),
+            'status'                => $request->getSafe('status', 'sanitize_text_field', Rider::STATUS_ACTIVE),
+            'joining_date'          => $request->getSafe('joining_date', 'sanitize_text_field') ?: DateTimeHelper::now(),
+            'address'               => $request->getSafe('address', 'fluentShipmentSanitizeArray'),
+            'emergency_contact'     => $request->getSafe('emergency_contact', 'fluentShipmentSanitizeArray'),
+            'notes'                 => $request->getSafe('notes', 'sanitize_text_field'),
             'rating'                => 0.0,
             'total_deliveries'      => 0,
             'successful_deliveries' => 0,
@@ -221,8 +220,8 @@ class RiderController extends Controller
 
     public function stats(Request $request)
     {
-        $dateFrom = $request->get('date_from');
-        $dateTo   = $request->get('date_to');
+        $dateFrom = $request->getSafe('date_from', 'sanitize_text_field');
+        $dateTo   = $request->getSafe('date_to', 'sanitize_text_field');
 
         $query = Rider::query();
 
@@ -277,7 +276,7 @@ class RiderController extends Controller
         ]);
 
         $riderIds = $request->get('rider_ids');
-        $status   = $request->get('status');
+        $status   = $request->getSafe('status', 'sanitize_text_field');
 
         $riders = Rider::whereIn('id', $riderIds)->get();
 
@@ -322,8 +321,8 @@ class RiderController extends Controller
             'limit' => 'nullable|integer|min:1|max:50',
         ]);
 
-        $query = $request->get('q');
-        $limit = $request->get('limit', 10);
+        $query = $request->getSafe('q', 'sanitize_text_field');
+        $limit = $request->getSafe('limit', 'intval', 10);
 
         $riders = Rider::search($query)
                        ->active()

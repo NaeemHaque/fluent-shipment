@@ -33,3 +33,24 @@ if (!function_exists('wpf_float_val')) {
         return $val;
     }
 }
+if (!function_exists('fluentShipmentSanitizeArray')) {
+    function fluentShipmentSanitizeArray(array $array)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = credexSanitizeArray($value);
+            } else {
+                $array[$key] = wp_kses_post($value);
+            }
+        }
+
+        return $array;
+    }
+}
+
+if (!function_exists('fluentShipmentSanitizeIds')) {
+    function fluentShipmentSanitizeIds(array $ids)
+    {
+        return array_map('intval', $ids);
+    }
+}
