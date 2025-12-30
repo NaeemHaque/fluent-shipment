@@ -128,6 +128,7 @@
                 background-color: var(--fluentshipment-primary-bg);
             }
             li {
+                height: auto;
                 color: var(--fluentshipment-secondary-text);
                 &:hover {
                     background-color: var(--fluentshipment-secondary-bg);

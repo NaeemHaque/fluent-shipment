@@ -51,6 +51,7 @@ class Shipment extends Model
         'customer_id',
         'customer_email',
         'customer_phone',
+        'rider_id',
         'weight_total',
         'dimensions',
         'shipping_cost',
@@ -100,6 +101,14 @@ class Shipment extends Model
     public function latestTrackingEvent()
     {
         return $this->trackingEvents()->first();
+    }
+
+    /**
+     * Get the assigned rider for this shipment
+     */
+    public function rider()
+    {
+        return $this->belongsTo(\FluentShipment\App\Models\Rider::class, 'rider_id', 'id');
     }
 
     /**

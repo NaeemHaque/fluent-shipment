@@ -21,7 +21,7 @@
             $('#fs-tracking-form').on('submit', this.handleFormSubmit.bind(this));
             
             // Real-time search as user types (debounced)
-            $('#fs-tracking-input').on('input', this.debounce(this.handleRealtimeSearch.bind(this), 500));
+            // $('#fs-tracking-input').on('input', this.debounce(this.handleRealtimeSearch.bind(this), 500));
             
             // Enter key handling
             $('#fs-tracking-input').on('keypress', function(e) {

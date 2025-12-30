@@ -131,6 +131,14 @@ class TrackingShortcode
                 'estimated_delivery' => $shipment->estimated_delivery,
                 'created_at' => $shipment->created_at,
                 'delivery_address' => $this->formatAddress($shipment->delivery_address),
+                'rider' => $shipment->rider ? [
+                    'id' => $shipment->rider->id,
+                    'rider_name' => $shipment->rider->rider_name,
+                    'phone' => $shipment->rider->phone,
+                    'vehicle_type' => $shipment->rider->vehicle_type,
+                    'avatar_url' => $shipment->rider->avatar_url,
+                    'rating' => $shipment->rider->rating,
+                ] : null,
             ],
             'events' => $events,
         ]);
@@ -164,7 +172,7 @@ class TrackingShortcode
      */
     private function findShipmentByTracking($trackingNumber)
     {
-        return Shipment::where('tracking_number', $trackingNumber)->first();
+        return Shipment::where('tracking_number', $trackingNumber)->with('rider')->first();
     }
 
     /**

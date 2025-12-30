@@ -318,6 +318,33 @@
                                         <p><strong>Address:</strong> {{ formatAddress(selectedShipment.delivery_address, true) }}</p>
                                         <p><strong>Estimated Delivery:</strong> {{ formatDate(selectedShipment.estimated_delivery) }}</p>
                                         <p v-if="selectedShipment.delivered_at"><strong>Delivered:</strong> {{ formatDateTime(selectedShipment.delivered_at) }}</p>
+                                        
+                                        <!-- Show rider information for out_for_delivery status -->
+                                        <div v-if="selectedShipment.current_status === 'out_for_delivery' && selectedShipment.rider" class="rider-info-section">
+                                            <h4>Assigned Rider</h4>
+                                            <div class="rider-details-card">
+                                                <div class="rider-avatar">
+                                                    <img v-if="selectedShipment.rider.avatar_url" 
+                                                         :src="selectedShipment.rider.avatar_url" 
+                                                         :alt="selectedShipment.rider.rider_name" />
+                                                    <div v-else class="avatar-placeholder">
+                                                        {{ getInitials(selectedShipment.rider.rider_name) }}
+                                                    </div>
+                                                </div>
+                                                <div class="rider-info-content">
+                                                    <div class="rider-name">{{ selectedShipment.rider.rider_name }}</div>
+                                                    <div class="rider-contact" v-if="selectedShipment.rider.phone">
+                                                        📞 {{ selectedShipment.rider.phone }}
+                                                    </div>
+                                                    <div class="rider-vehicle" v-if="selectedShipment.rider.vehicle_type">
+                                                        🚐 {{ selectedShipment.rider.vehicle_type }}
+                                                    </div>
+                                                    <div class="rider-rating" v-if="selectedShipment.rider.rating > 0">
+                                                        ⭐ {{ selectedShipment.rider.rating.toFixed(1) }}/5.0
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </el-col>
                                 </el-row>
                             </div>
@@ -359,7 +386,7 @@
                    </div>
                     
                     <el-form-item label="New Status">
-                        <el-select v-model="editForm.status" placeholder="Select status">
+                        <el-select v-model="editForm.status" placeholder="Select status" @change="onStatusChange">
                             <el-option label="Pending" value="pending"></el-option>
                             <el-option label="Processing" value="processing"></el-option>
                             <el-option label="Shipped" value="shipped"></el-option>
@@ -371,17 +398,59 @@
                         </el-select>
                     </el-form-item>
                     
-                    <el-form-item label="Location">
-                        <el-input v-model="editForm.location" placeholder="Optional location"></el-input>
+                    <!-- Show rider selection for out_for_delivery status -->
+                    <el-form-item v-if="editForm.status === 'out_for_delivery'" label="Assign Rider" required>
+                        <el-select 
+                            v-model="editForm.rider_id" 
+                            placeholder="Select a rider for delivery"
+                            :loading="loadingRiders"
+                            filterable
+                            remote
+                            :remote-method="searchRiders"
+                            class="rider-select"
+                        >
+                            <el-option
+                                v-for="rider in availableRiders"
+                                :key="rider.id"
+                                :label="rider.rider_name"
+                                :value="rider.id"
+                            >
+                                <div class="rider-option">
+                                    <div class="rider-avatar-small">
+                                        <img v-if="rider.avatar_url" :src="rider.avatar_url" :alt="rider.rider_name" />
+                                        <div v-else class="avatar-placeholder-small">
+                                            {{ getInitials(rider.rider_name) }}
+                                        </div>
+                                    </div>
+                                    <div class="rider-info">
+                                        <p class="rider-name">{{ rider.rider_name }}</p>
+                                        <div class="rider-details">
+                                            <p class="rider-phone">{{ rider.phone || 'No phone' }}</p>
+                                            <p class="rider-vehicle">{{ getVehicleTypeLabel(rider.vehicle_type) }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="rider-rating">
+                                        <el-rate v-model="rider.rating" disabled size="small" show-score score-template="{value}"/>
+                                    </div>
+                                </div>
+                            </el-option>
+                        </el-select>
                     </el-form-item>
                     
-                    <el-form-item label="Description">
-                        <el-input 
-                            v-model="editForm.description" 
-                            type="textarea" 
-                            placeholder="Optional description"
-                        ></el-input>
-                    </el-form-item>
+                    <!-- Show location and description for other statuses -->
+                    <template v-if="editForm.status !== 'out_for_delivery'">
+                        <el-form-item label="Location">
+                            <el-input v-model="editForm.location" placeholder="Optional location"></el-input>
+                        </el-form-item>
+                        
+                        <el-form-item label="Description">
+                            <el-input 
+                                v-model="editForm.description" 
+                                type="textarea" 
+                                placeholder="Optional description"
+                            ></el-input>
+                        </el-form-item>
+                    </template>
                 </el-form>
                 
                 <template #footer>
@@ -456,10 +525,12 @@ export default {
             bulkUpdating: false,
             loadingStats: false,
             loadingEvents: false,
+            loadingRiders: false,
             
             shipments: [],
             selectedRows: [],
             searchTimeout: null,
+            availableRiders: [],
             
             pagination: {
                 current_page: 1,
@@ -497,7 +568,8 @@ export default {
             editForm: {
                 status: '',
                 location: '',
-                description: ''
+                description: '',
+                rider_id: null
             },
             
             bulkEditForm: {
@@ -648,14 +720,26 @@ export default {
             this.editForm = {
                 status: shipment.current_status,
                 location: '',
-                description: ''
+                description: '',
+                rider_id: null
             };
             this.showEditDialog = true;
+            
+            // Load riders if needed
+            if (this.availableRiders.length === 0) {
+                this.loadActiveRiders();
+            }
         },
 
         updateStatus() {
             if (!this.editForm.status) {
                 this.$notifyError('Please select a status');
+                return;
+            }
+            
+            // Validate rider selection for out_for_delivery
+            if (this.editForm.status === 'out_for_delivery' && !this.editForm.rider_id) {
+                this.$notifyError('Please select a rider for delivery');
                 return;
             }
 
@@ -666,6 +750,11 @@ export default {
                 location: this.editForm.location,
                 description: this.editForm.description
             };
+            
+            // Add rider_id if status is out_for_delivery
+            if (this.editForm.status === 'out_for_delivery' && this.editForm.rider_id) {
+                data.rider_id = this.editForm.rider_id;
+            }
 
             this.$put(`shipments/${this.selectedShipment.id}/status`, data)
                 .then(res => {
@@ -995,6 +1084,64 @@ export default {
         // Table selection
         handleSelectionChange(selection) {
             this.selectedRows = selection;
+        },
+        
+        // Rider related methods
+        loadActiveRiders() {
+            this.loadingRiders = true;
+            this.$get('riders/active')
+                .then(res => {
+                    if (res.success) {
+                        this.availableRiders = res.riders || [];
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to load riders:', err);
+                })
+                .finally(() => {
+                    this.loadingRiders = false;
+                });
+        },
+        
+        searchRiders(query) {
+            if (query !== '') {
+                this.loadingRiders = true;
+                this.$get('riders/search', { q: query, limit: 20 })
+                    .then(res => {
+                        if (res.success) {
+                            this.availableRiders = res.riders || [];
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Failed to search riders:', err);
+                    })
+                    .finally(() => {
+                        this.loadingRiders = false;
+                    });
+            }
+        },
+        
+        onStatusChange(status) {
+            // Clear rider selection when status changes
+            if (status !== 'out_for_delivery') {
+                this.editForm.rider_id = null;
+            }
+        },
+        
+        getInitials(name) {
+            if (!name) return 'R';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        },
+        
+        getVehicleTypeLabel(vehicleType) {
+            const labels = {
+                'bike': 'Bike',
+                'motorcycle': 'Motorcycle', 
+                'car': 'Car',
+                'van': 'Van',
+                'truck': 'Truck'
+            };
+            return labels[vehicleType] || vehicleType || 'N/A';
         }
     },
 
@@ -1011,3 +1158,150 @@ export default {
 
 };
 </script>
+
+<style scoped lang="scss">
+.rider-option {
+    display: flex;
+    align-items: center;
+    gap: 0 12px;
+    padding: 4px 0;
+    
+    .rider-avatar-small {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-placeholder-small {
+            width: 100%;
+            height: 100%;
+            background: #409EFF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    }
+    
+    .rider-info {
+        flex: 1;
+        min-width: 0;
+        
+        .rider-name {
+            font-weight: 500;
+            color: #303133;
+        }
+        
+        .rider-details {
+            font-size: 12px;
+            color: #909399;
+            display: flex;
+            gap: 12px;
+            padding: 0;
+            
+            .rider-phone, .rider-vehicle {
+                flex-shrink: 0;
+            }
+        }
+    }
+    
+    .rider-rating {
+        flex-shrink: 0;
+    }
+}
+
+:deep(.el-select-dropdown__item) {
+    height: auto !important;
+    padding: 8px 20px !important;
+    line-height: 1.4 !important;
+}
+
+.rider-info-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #EBEEF5;
+    
+    h4 {
+        margin: 0 0 12px 0;
+        color: #303133;
+        font-size: 14px;
+        font-weight: 600;
+    }
+}
+
+.rider-details-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8fbff;
+    border: 1px solid #e3f2fd;
+    border-radius: 8px;
+    
+    .rider-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #409EFF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    }
+    
+    .rider-info-content {
+        flex: 1;
+        
+        .rider-name {
+            font-weight: 600;
+            color: #303133;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+        
+        .rider-contact,
+        .rider-vehicle,
+        .rider-rating {
+            font-size: 12px;
+            color: #606266;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .rider-rating {
+            color: #f39c12;
+            font-weight: 500;
+        }
+    }
+}
+</style>

@@ -32,8 +32,13 @@ class ShipmentController extends Controller
         
         // Include relationships
         $with = $request->get('with', []);
-        $allowedWith = ['trackingEvents', 'latestTrackingEvent'];
+        $allowedWith = ['trackingEvents', 'latestTrackingEvent', 'rider'];
         $with = array_intersect((array)$with, $allowedWith);
+        
+        // Always include rider relationship
+        if (!in_array('rider', $with)) {
+            $with[] = 'rider';
+        }
 
         $query = Shipment::query();
 
@@ -271,6 +276,7 @@ class ShipmentController extends Controller
             'status' => 'required|string|in:' . implode(',', Shipment::getStatuses()),
             'location' => 'string|max:255',
             'description' => 'string|max:500',
+            'rider_id' => 'nullable|integer|exists:fluent_shipment_riders,id',
             'sync_to_order' => 'boolean',
         ]);
 
@@ -279,7 +285,20 @@ class ShipmentController extends Controller
         $newStatus = $request->get('status');
         $location = $request->get('location');
         $description = $request->get('description');
+        $riderId = $request->get('rider_id');
         $syncToOrder = $request->get('sync_to_order', true);
+
+        // Handle rider assignment for out_for_delivery status
+        if ($newStatus === Shipment::STATUS_OUT_FOR_DELIVERY && $riderId) {
+            $shipment->rider_id = $riderId;
+            $shipment->save();
+            
+            // Update delivery statistics for the rider
+            $rider = \FluentShipment\App\Models\Rider::find($riderId);
+            if ($rider) {
+                $rider->increment('total_deliveries');
+            }
+        }
 
         // Update shipment status
         $eventData = array_filter([

@@ -34,6 +34,7 @@ class FluentCartOrderTrackingHandler
         // Get shipment for this order
         $shipment = Shipment::where('order_id', $order->id)
             ->where('order_source', Shipment::SOURCE_FLUENT_CART)
+            ->with('rider')
             ->first();
 
         if (!$shipment) {
@@ -135,6 +136,39 @@ class FluentCartOrderTrackingHandler
                 $html .= '</div>';
                 $html .= '</div>';
             }
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+
+        // Rider Information (for out_for_delivery status)
+        if ( ($shipment->current_status === 'out_for_delivery' || $shipment->current_status === 'delivered') && $shipment->rider) {
+            $rider = $shipment->rider;
+            $html .= '<div class="fct-rider-info-section">';
+            $html .= '<h4 class="fct-rider-title">Delivery Person</h4>';
+            $html .= '<div class="fct-rider-details">';
+
+            if ($rider->avatar_url) {
+                $html .= '<div class="fct-rider-avatar">';
+                $html .= '<img src="' . esc_url($rider->avatar_url) . '" alt="' . esc_attr($rider->rider_name) . '" />';
+                $html .= '</div>';
+            }
+
+            $html .= '<div class="fct-rider-info-content">';
+            $html .= '<div class="fct-rider-name">' . esc_html($rider->rider_name) . '</div>';
+
+            if ($rider->phone) {
+                $html .= '<div class="fct-rider-contact">📞 ' . esc_html($rider->phone) . '</div>';
+            }
+
+            if ($rider->vehicle_type) {
+                $html .= '<div class="fct-rider-vehicle">🚐 ' . esc_html(ucfirst($rider->vehicle_type)) . '</div>';
+            }
+
+            if ($rider->rating > 0) {
+                $html .= '<div class="fct-rider-rating">⭐ ' . esc_html(number_format($rider->rating, 1)) . '/5.0</div>';
+            }
+
+            $html .= '</div>';
             $html .= '</div>';
             $html .= '</div>';
         }

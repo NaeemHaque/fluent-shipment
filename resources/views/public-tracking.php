@@ -116,6 +116,36 @@ if (!defined('ABSPATH')) {
                             ?></span>
                         </div>
                         <?php endif; ?>
+                        
+                        <?php 
+                        // Display rider information if status is out_for_delivery and rider is assigned
+                        if ( ($shipment->current_status === 'out_for_delivery' || $shipment->current_status === 'delivered') && $shipment->rider_id):
+                            $rider = $shipment->rider;
+                            if ($rider): 
+                        ?>
+                        <div class="fs-detail-item fs-detail-full fs-rider-info">
+                            <label>Delivery Person:</label>
+                            <div class="fs-rider-details">
+                                <?php if ($rider->avatar_url): ?>
+                                <div class="fs-rider-avatar">
+                                    <img src="<?php echo esc_url($rider->avatar_url); ?>" alt="<?php echo esc_attr($rider->rider_name); ?>" />
+                                </div>
+                                <?php endif; ?>
+                                <div class="fs-rider-info-content">
+                                    <div class="fs-rider-name"><?php echo esc_html($rider->rider_name); ?></div>
+                                    <?php if ($rider->phone): ?>
+                                    <div class="fs-rider-phone">📞 <?php echo esc_html($rider->phone); ?></div>
+                                    <?php endif; ?>
+                                    <?php if ($rider->vehicle_type): ?>
+                                    <div class="fs-rider-vehicle">🚐 <?php echo esc_html(ucfirst($rider->vehicle_type)); ?></div>
+                                    <?php endif; ?>
+                                    <?php if ($rider->rating > 0): ?>
+                                    <div class="fs-rider-rating">⭐ <?php echo esc_html(number_format($rider->rating, 1)); ?>/5.0</div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; endif; ?>
                     </div>
                 </div>
 

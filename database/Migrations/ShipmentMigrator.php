@@ -35,6 +35,7 @@ class ShipmentMigrator
                 customer_id BIGINT UNSIGNED NULL,
                 customer_email VARCHAR(100) NULL,
                 customer_phone VARCHAR(20) NULL,
+                rider_id BIGINT UNSIGNED NULL,
                 weight_total DECIMAL(10,3) NULL,
                 dimensions JSON NULL,
                 shipping_cost BIGINT UNSIGNED DEFAULT 0,
@@ -52,6 +53,7 @@ class ShipmentMigrator
                 INDEX `{$indexPrefix}current_status` (current_status),
                 INDEX `{$indexPrefix}customer_id` (customer_id),
                 INDEX `{$indexPrefix}customer_email` (customer_email),
+                INDEX `{$indexPrefix}rider_id` (rider_id),
                 INDEX `{$indexPrefix}carrier` (carrier),
                 INDEX `{$indexPrefix}created_at` (created_at),
                 UNIQUE KEY `{$indexPrefix}unique_order_shipment` (order_id, order_source)
