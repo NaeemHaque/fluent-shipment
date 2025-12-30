@@ -10,7 +10,6 @@ use FluentShipment\App\Http\Controllers\RiderController;
 
 
 $router->get('/dashboard', [DashboardController::class, 'index']);
-$router->post('/migrate', [DashboardController::class, 'runMigrations']);
 
 $router->prefix('/shipments')->group(function () use ($router) {
     // List shipments

@@ -19,9 +19,7 @@ $app->addAction('admin_menu', 'AdminMenuHandler');
 
 $app->addCustomAction('exception', 'ExceptionHandler');
 
-// Register FluentCart integration hooks
 $app->addAction('plugins_loaded', function() {
-    // Check if FluentCart is active before registering hooks
     if (defined('FLUENTCART_VERSION')) {
         \FluentShipment\App\Hooks\Handlers\FluentCartHookHandler::register();
         \FluentShipment\App\Hooks\Handlers\FluentCartOrderTrackingHandler::register();

@@ -47,7 +47,6 @@ class ActivationHandler
 
     protected function activatePlugin()
     {
-        // Plugin Activation Code...
         DBMigrator::migrateUp();
     }
 }

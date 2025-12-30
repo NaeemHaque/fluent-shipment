@@ -8,144 +8,95 @@ use FluentShipment\Framework\Randomizer\Randomizer;
 
 class ShipmentService
 {
-    /**
-     * Generate a unique tracking number
-     * 
-     * @param string $type Optional type (auto, manual, import)
-     * @return string
-     */
     public static function generateTrackingNumber($type = 'auto')
     {
         do {
             $trackingNumber = static::buildTrackingNumber($type);
-            $exists = Shipment::where('tracking_number', $trackingNumber)->exists();
+            $exists         = Shipment::where('tracking_number', $trackingNumber)->exists();
         } while ($exists);
 
         return $trackingNumber;
     }
 
-    /**
-     * Build tracking number with format
-     * 
-     * @param string $type
-     * @return string
-     */
     private static function buildTrackingNumber($type)
     {
-        $prefix = static::getTrackingPrefix($type);
-        $timestamp = date('Ymd');
+        $prefix     = static::getTrackingPrefix($type);
+        $timestamp  = date('Ymd');
         $randomizer = new Randomizer();
-        $random = strtoupper($randomizer->getString(8, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
-        
+        $random     = strtoupper($randomizer->getString(8, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
+
         return $prefix . $timestamp . $random;
     }
 
-    /**
-     * Get tracking number prefix based on type
-     * 
-     * @param string $type
-     * @return string
-     */
     private static function getTrackingPrefix($type)
     {
         $typePrefix = $type === 'manual' ? 'M' : 'A';
-        
+
         return 'FS' . $typePrefix;
     }
 
-    /**
-     * Map fluent-cart shipping status to shipment status
-     * 
-     * @param string $shippingStatus
-     * @return string
-     */
     public static function mapFluentCartShippingStatus($shippingStatus)
     {
         $statusMap = [
-            'unshipped' => Shipment::STATUS_PENDING,
-            'shipped' => Shipment::STATUS_SHIPPED,
-            'delivered' => Shipment::STATUS_DELIVERED,
+            'unshipped'   => Shipment::STATUS_PENDING,
+            'shipped'     => Shipment::STATUS_SHIPPED,
+            'delivered'   => Shipment::STATUS_DELIVERED,
             'unshippable' => Shipment::STATUS_CANCELLED,
         ];
 
         return $statusMap[$shippingStatus] ?? Shipment::STATUS_PENDING;
     }
 
-    /**
-     * Map fluent-cart order status to shipment status
-     * 
-     * @param string $orderStatus
-     * @return string|null
-     */
     public static function mapFluentCartOrderStatus($orderStatus)
     {
         $statusMap = [
-            'pending' => Shipment::STATUS_PENDING,
+            'pending'    => Shipment::STATUS_PENDING,
             'processing' => Shipment::STATUS_PROCESSING,
-            'completed' => Shipment::STATUS_SHIPPED, // Completed orders can be marked as shipped
-            'cancelled' => Shipment::STATUS_CANCELLED,
-            'refunded' => Shipment::STATUS_CANCELLED,
-            'failed' => Shipment::STATUS_FAILED,
+            'completed'  => Shipment::STATUS_SHIPPED, // Completed orders can be marked as shipped
+            'cancelled'  => Shipment::STATUS_CANCELLED,
+            'refunded'   => Shipment::STATUS_CANCELLED,
+            'failed'     => Shipment::STATUS_FAILED,
         ];
 
         return $statusMap[$orderStatus] ?? null;
     }
 
-    /**
-     * Map shipment status back to fluent-cart shipping status
-     * 
-     * @param string $shipmentStatus
-     * @return string
-     */
     public static function mapToFluentCartShippingStatus($shipmentStatus)
     {
         $statusMap = [
-            Shipment::STATUS_PENDING => 'unshipped',
-            Shipment::STATUS_PROCESSING => 'unshipped',
-            Shipment::STATUS_SHIPPED => 'shipped',
-            Shipment::STATUS_IN_TRANSIT => 'shipped',
+            Shipment::STATUS_PENDING          => 'unshipped',
+            Shipment::STATUS_PROCESSING       => 'unshipped',
+            Shipment::STATUS_SHIPPED          => 'shipped',
+            Shipment::STATUS_IN_TRANSIT       => 'shipped',
             Shipment::STATUS_OUT_FOR_DELIVERY => 'shipped',
-            Shipment::STATUS_DELIVERED => 'delivered',
-            Shipment::STATUS_FAILED => 'unshippable',
-            Shipment::STATUS_CANCELLED => 'unshippable',
-            Shipment::STATUS_RETURNED => 'unshippable',
-            Shipment::STATUS_EXCEPTION => 'unshippable',
+            Shipment::STATUS_DELIVERED        => 'delivered',
+            Shipment::STATUS_FAILED           => 'unshippable',
+            Shipment::STATUS_CANCELLED        => 'unshippable',
+            Shipment::STATUS_RETURNED         => 'unshippable',
+            Shipment::STATUS_EXCEPTION        => 'unshippable',
         ];
 
         return $statusMap[$shipmentStatus] ?? 'unshipped';
     }
 
-    /**
-     * Format address from fluent-cart OrderAddress model to array
-     * 
-     * @param object $address OrderAddress model
-     * @return array
-     */
     public static function formatAddressArray($address)
     {
-        if (!$address) {
+        if ( ! $address) {
             return [];
         }
 
         return [
-            'name' => $address->name ?? '',
+            'name'      => $address->name ?? '',
             'address_1' => $address->address_1 ?? '',
             'address_2' => $address->address_2 ?? '',
-            'city' => $address->city ?? '',
-            'state' => $address->state ?? '',
-            'postcode' => $address->postcode ?? '',
-            'country' => $address->country ?? '',
-            'email' => $address->email ?? '',
+            'city'      => $address->city ?? '',
+            'state'     => $address->state ?? '',
+            'postcode'  => $address->postcode ?? '',
+            'country'   => $address->country ?? '',
+            'email'     => $address->email ?? '',
         ];
     }
 
-    /**
-     * Format address array to display string
-     * 
-     * @param array $address
-     * @param bool $includeNaame
-     * @return string
-     */
     public static function formatAddressString($address, $includeName = true)
     {
         if (empty($address)) {
@@ -153,43 +104,36 @@ class ShipmentService
         }
 
         $parts = [];
-        
-        if ($includeName && !empty($address['name'])) {
+
+        if ($includeName && ! empty($address['name'])) {
             $parts[] = $address['name'];
         }
-        
-        if (!empty($address['address_1'])) {
+
+        if ( ! empty($address['address_1'])) {
             $parts[] = $address['address_1'];
         }
-        
-        if (!empty($address['address_2'])) {
+
+        if ( ! empty($address['address_2'])) {
             $parts[] = $address['address_2'];
         }
-        
+
         $cityStateZip = array_filter([
             $address['city'] ?? '',
             $address['state'] ?? '',
             $address['postcode'] ?? '',
         ]);
-        
-        if (!empty($cityStateZip)) {
+
+        if ( ! empty($cityStateZip)) {
             $parts[] = implode(', ', $cityStateZip);
         }
-        
-        if (!empty($address['country'])) {
+
+        if ( ! empty($address['country'])) {
             $parts[] = $address['country'];
         }
 
         return implode(', ', array_filter($parts));
     }
 
-    /**
-     * Calculate estimated delivery date
-     * 
-     * @param array $origin
-     * @param array $destination
-     * @return string|null
-     */
     public static function calculateEstimatedDelivery($origin = [], $destination = [])
     {
         $days = 5; // Default delivery days
@@ -197,7 +141,7 @@ class ShipmentService
         // Add weekend buffer
         $estimatedDate = new \DateTime();
         $estimatedDate->add(new \DateInterval('P' . $days . 'D'));
-        
+
         // Skip weekends for business delivery
         while ($estimatedDate->format('N') >= 6) {
             $estimatedDate->add(new \DateInterval('P1D'));
@@ -206,142 +150,107 @@ class ShipmentService
         return $estimatedDate->format('Y-m-d');
     }
 
-    /**
-     * Create shipment from fluent-cart order
-     * 
-     * @param object $order FluentCart Order model
-     * @param array $options Additional options
-     * @return Shipment|false
-     */
     public static function createFromFluentCartOrder($order, $options = [])
     {
-        // Validate order
-        if (!static::isOrderShippable($order)) {
+        if ( ! static::isOrderShippable($order)) {
             return false;
         }
 
-        // Check for existing shipment
         $existing = Shipment::where('order_id', $order->id)
-                           ->where('order_source', Shipment::SOURCE_FLUENT_CART)
-                           ->first();
-        
-        if ($existing) {
-            return false; // Already exists
-        }
+                            ->where('order_source', Shipment::SOURCE_FLUENT_CART)
+                            ->first();
 
-        // Get shipping address
-        $shippingAddress = $order->shipping_address;
-        if (!$shippingAddress) {
+        if ($existing) {
             return false;
         }
 
-        // Prepare shipment data
+        $shippingAddress = $order->shipping_address;
+        if ( ! $shippingAddress) {
+            return false;
+        }
+
         $shipmentData = [
-            'order_id' => $order->id,
-            'order_source' => Shipment::SOURCE_FLUENT_CART,
-            'order_hash' => $order->uuid ?? null,
-            'tracking_number' => static::generateTrackingNumber(),
-            'current_status' => static::mapFluentCartShippingStatus($order->shipping_status ?? 'unshipped'),
-            'shipping_address' => static::formatAddressArray($shippingAddress),
-            'delivery_address' => static::formatAddressArray($shippingAddress),
-            'estimated_delivery' => static::calculateEstimatedDelivery(),
-            'customer_id' => $order->customer_id,
-            'customer_email' => $order->customer->email ?? $shippingAddress->email ?? null,
-            'shipping_cost' => $order->shipping_total ?? 0,
-            'currency' => $order->currency ?? 'USD',
-            'package_info' => static::extractPackageInfo($order),
-            'weight_total' => static::calculateTotalWeight($order),
+            'order_id'             => $order->id,
+            'order_source'         => Shipment::SOURCE_FLUENT_CART,
+            'order_hash'           => $order->uuid ?? null,
+            'tracking_number'      => static::generateTrackingNumber(),
+            'current_status'       => static::mapFluentCartShippingStatus($order->shipping_status ?? 'unshipped'),
+            'shipping_address'     => static::formatAddressArray($shippingAddress),
+            'delivery_address'     => static::formatAddressArray($shippingAddress),
+            'estimated_delivery'   => static::calculateEstimatedDelivery(),
+            'customer_id'          => $order->customer_id,
+            'customer_email'       => $order->customer->email ?? $shippingAddress->email ?? null,
+            'shipping_cost'        => $order->shipping_total ?? 0,
+            'currency'             => $order->currency ?? 'USD',
+            'package_info'         => static::extractPackageInfo($order),
+            'weight_total'         => static::calculateTotalWeight($order),
             'special_instructions' => $order->note ?? null,
         ];
 
-        // Create shipment
         $shipment = Shipment::create($shipmentData);
-        
+
         if ($shipment) {
-            // Create initial tracking event
             $shipment->createTrackingEvent($shipment->current_status, [
                 'description' => 'Shipment created from order #' . ($order->invoice_no ?? $order->id),
-                'location' => 'Fulfillment Center',
+                'location'    => 'Fulfillment Center',
             ]);
         }
 
         return $shipment;
     }
 
-    /**
-     * Check if fluent-cart order is shippable
-     * 
-     * @param object $order
-     * @return bool
-     */
     public static function isOrderShippable($order)
     {
-        // Check if order has physical products
         if ($order->fulfillment_type !== 'physical') {
             return false;
         }
 
-        // Check payment status
-        if (!in_array($order->payment_status, ['paid', 'partially_paid'])) {
+        if ( ! in_array($order->payment_status, ['paid', 'partially_paid'])) {
             return false;
         }
 
-        // Check order status
-        if (!in_array($order->status, ['processing', 'completed'])) {
+        if ( ! in_array($order->status, ['processing', 'completed'])) {
             return false;
         }
 
-        // Check if shipping address exists
-        if (!$order->shipping_address) {
+        if ( ! $order->shipping_address) {
             return false;
         }
 
         return true;
     }
 
-    /**
-     * Extract package information from order
-     * 
-     * @param object $order
-     * @return array
-     */
     public static function extractPackageInfo($order)
     {
         $items = [];
-        
+
         if ($order->order_items) {
             foreach ($order->order_items as $item) {
                 $items[] = [
-                    'product_id' => $item->post_id,
+                    'product_id'   => $item->post_id,
                     'variation_id' => $item->object_id,
-                    'name' => $item->title . ' - ' . $item->post_title,
-                    'quantity' => $item->quantity,
-                    'weight' => $item->weight ?? 0,
+                    'name'         => $item->title . ' - ' . $item->post_title,
+                    'quantity'     => $item->quantity,
+                    'weight'       => $item->weight ?? 0,
                 ];
             }
         }
 
         return [
-            'items' => $items,
-            'total_items' => count($items),
+            'items'          => $items,
+            'total_items'    => count($items),
             'total_quantity' => array_sum(array_column($items, 'quantity')),
         ];
     }
 
-    /**
-     * Calculate total weight from order items
-     * 
-     * @param object $order
-     * @return float
-     */
     public static function calculateTotalWeight($order)
     {
         $totalWeight = 0;
-        
+
         if ($order->order_items) {
             foreach ($order->order_items as $item) {
-                $weight = $item->weight ?? 0;
-                $quantity = $item->quantity ?? 1;
+                $weight      = $item->weight ?? 0;
+                $quantity    = $item->quantity ?? 1;
                 $totalWeight += ($weight * $quantity);
             }
         }
@@ -349,91 +258,76 @@ class ShipmentService
         return $totalWeight;
     }
 
-    /**
-     * Sync shipment status back to fluent-cart order
-     * 
-     * @param Shipment $shipment
-     * @return bool
-     */
     public static function syncToFluentCartOrder(Shipment $shipment)
     {
         if ($shipment->order_source !== Shipment::SOURCE_FLUENT_CART) {
             return false;
         }
 
-        // Check if fluent-cart is available
-        if (!class_exists('\FluentCart\App\Models\Order')) {
+        if ( ! class_exists('\FluentCart\App\Models\Order')) {
             return false;
         }
 
         $orderClass = '\FluentCart\App\Models\Order';
-        $order = $orderClass::find($shipment->order_id);
-        
-        if (!$order) {
+        $order      = $orderClass::find($shipment->order_id);
+
+        if ( ! $order) {
             return false;
         }
 
-        // Map shipment status to fluent-cart shipping status
         $fluentCartStatus = static::mapToFluentCartShippingStatus($shipment->current_status);
-        
-        // Update order shipping status
+
         $order->shipping_status = $fluentCartStatus;
-        
+
         return $order->save();
     }
 
-    /**
-     * Bulk create shipments from fluent-cart orders
-     * 
-     * @param array $orderIds
-     * @param array $options
-     * @return array
-     */
     public static function bulkCreateFromFluentCartOrders($orderIds, $options = [])
     {
         $results = [
             'created' => [],
             'skipped' => [],
-            'errors' => [],
+            'errors'  => [],
         ];
 
-        if (!class_exists('\FluentCart\App\Models\Order')) {
+        if ( ! class_exists('\FluentCart\App\Models\Order')) {
             $results['errors'][] = 'FluentCart plugin not found';
+
             return $results;
         }
 
         $orderClass = '\FluentCart\App\Models\Order';
-        $orders = $orderClass::with(['shipping_address', 'customer', 'order_items'])
-                            ->whereIn('id', $orderIds)
-                            ->get();
+        $orders     = $orderClass::with(['shipping_address', 'customer', 'order_items'])
+                                 ->whereIn('id', $orderIds)
+                                 ->get();
 
         foreach ($orders as $order) {
             $shipment = static::createFromFluentCartOrder($order, $options);
-            
+
             if ($shipment) {
                 $results['created'][] = [
-                    'order_id' => $order->id,
-                    'shipment_id' => $shipment->id,
+                    'order_id'        => $order->id,
+                    'shipment_id'     => $shipment->id,
                     'tracking_number' => $shipment->tracking_number,
                 ];
             } else {
                 $reason = 'Unknown error';
-                
-                if (!static::isOrderShippable($order)) {
+
+                if ( ! static::isOrderShippable($order)) {
                     $reason = 'Order not shippable';
                 }
-                
+
                 $existing = Shipment::where('order_id', $order->id)
-                                  ->where('order_source', Shipment::SOURCE_FLUENT_CART)
-                                  ->first();
-                
+                                    ->where('order_source', Shipment::SOURCE_FLUENT_CART)
+                                    ->first();
+
                 if ($existing) {
                     $reason = 'Shipment already exists';
                 }
 
                 $results['skipped'][] = [
                     'order_id' => $order->id,
-                    'reason' => $reason,
+                    'reason'   => $reason,
                 ];
             }
         }

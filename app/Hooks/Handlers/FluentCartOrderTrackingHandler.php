@@ -7,65 +7,43 @@ use FluentShipment\App\Models\ShipmentTrackingEvent;
 
 class FluentCartOrderTrackingHandler
 {
-    /**
-     * Register the hooks
-     */
     public static function register()
     {
         add_filter('fluent_cart/customer/order_details_section_parts', [__CLASS__, 'addOrderTrackingSection'], 10, 2);
         add_action('wp_enqueue_scripts', [__CLASS__, 'enqueueTrackingAssets']);
     }
 
-    /**
-     * Add tracking section to FluentCart order details
-     * 
-     * @param array $sections
-     * @param array $data
-     * @return array
-     */
     public static function addOrderTrackingSection($sections, $data)
     {
         $order = $data['order'] ?? null;
-        
-        if (!$order || $order->fulfillment_type !== 'physical') {
+
+        if ( ! $order || $order->fulfillment_type !== 'physical') {
             return $sections;
         }
 
-        // Get shipment for this order
         $shipment = Shipment::where('order_id', $order->id)
-            ->where('order_source', Shipment::SOURCE_FLUENT_CART)
-            ->with('rider')
-            ->first();
+                            ->where('order_source', Shipment::SOURCE_FLUENT_CART)
+                            ->with('rider')
+                            ->first();
 
-        if (!$shipment) {
+        if ( ! $shipment) {
             return $sections;
         }
 
-        // Ensure CSS is enqueued since we're displaying tracking content
         self::enqueueTrackingCss();
 
-        // Get tracking events
         $trackingEvents = ShipmentTrackingEvent::forShipment($shipment->id)
-            ->orderBy('event_date', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->get();
+                                               ->orderBy('event_date', 'desc')
+                                               ->orderBy('created_at', 'desc')
+                                               ->get();
 
-        // Generate the tracking section HTML
         $trackingHtml = self::generateTrackingHtml($shipment, $trackingEvents);
 
-        // Add to the after_transactions section
         $sections['after_transactions'] = ($sections['after_transactions'] ?? '') . $trackingHtml;
 
         return $sections;
     }
 
-    /**
-     * Generate tracking section HTML
-     * 
-     * @param \FluentShipment\App\Models\Shipment $shipment
-     * @param \Illuminate\Database\Eloquent\Collection $trackingEvents
-     * @return string
-     */
     private static function generateTrackingHtml($shipment, $trackingEvents)
     {
         $trackingNumber     = esc_html($shipment->tracking_number);
@@ -91,48 +69,54 @@ class FluentCartOrderTrackingHandler
         $html .= '</div>';
 
         // Tracking Timeline
-        if (!$trackingEvents->isEmpty()) {
+        if ( ! $trackingEvents->isEmpty()) {
             $html .= '<div class="fct-tracking-timeline">';
             $html .= '<h4 class="fct-timeline-title">Tracking History</h4>';
-            
+
             $html .= '<div class="fct-timeline">';
             foreach ($trackingEvents as $index => $event) {
-                $isFirst = $index === 0;
-                $isLast = $index === count($trackingEvents) - 1;
+                $isFirst     = $index === 0;
+                $isLast      = $index === count($trackingEvents) - 1;
                 $isMilestone = $event->is_milestone;
-                
-                $eventStatus = esc_html(self::getStatusLabel($event->event_status));
+
+                $eventStatus      = esc_html(self::getStatusLabel($event->event_status));
                 $eventStatusClass = esc_attr(self::getStatusClass($event->event_status));
-                $eventDate = $event->event_date ? esc_html(date('M j, Y g:i A', strtotime($event->event_date))) : '';
+                $eventDate        = $event->event_date ? esc_html(
+                    date('M j, Y g:i A', strtotime($event->event_date))
+                ) : '';
                 $eventDescription = $event->event_description ? esc_html($event->event_description) : '';
-                $eventLocation = $event->event_location ? esc_html($event->event_location) : '';
+                $eventLocation    = $event->event_location ? esc_html($event->event_location) : '';
 
                 $itemClasses = ['fct-timeline-item'];
-                if ($isFirst) $itemClasses[] = 'fct-timeline-current';
-                if ($isMilestone) $itemClasses[] = 'fct-timeline-milestone';
+                if ($isFirst) {
+                    $itemClasses[] = 'fct-timeline-current';
+                }
+                if ($isMilestone) {
+                    $itemClasses[] = 'fct-timeline-milestone';
+                }
 
                 $html .= '<div class="' . implode(' ', $itemClasses) . '">';
                 $html .= '<div class="fct-timeline-marker">';
                 $html .= '<div class="fct-timeline-dot"></div>';
-                if (!$isLast) {
+                if ( ! $isLast) {
                     $html .= '<div class="fct-timeline-line"></div>';
                 }
                 $html .= '</div>';
-                
+
                 $html .= '<div class="fct-timeline-content">';
                 $html .= '<div class="fct-timeline-header">';
                 $html .= '<span class="fct-timeline-status ' . $eventStatusClass . '">' . $eventStatus . '</span>';
                 $html .= '<span class="fct-timeline-date">' . $eventDate . '</span>';
                 $html .= '</div>';
-                
+
                 if ($eventDescription) {
                     $html .= '<div class="fct-timeline-description">' . $eventDescription . '</div>';
                 }
-                
+
                 if ($eventLocation) {
                     $html .= '<div class="fct-timeline-location">📍 ' . $eventLocation . '</div>';
                 }
-                
+
                 $html .= '</div>';
                 $html .= '</div>';
             }
@@ -141,11 +125,11 @@ class FluentCartOrderTrackingHandler
         }
 
         // Rider Information (for out_for_delivery status)
-        if ( ($shipment->current_status === 'out_for_delivery' || $shipment->current_status === 'delivered') && $shipment->rider) {
+        if (($shipment->current_status === 'out_for_delivery' || $shipment->current_status === 'delivered') && $shipment->rider) {
             $rider = $shipment->rider;
-            $html .= '<div class="fct-rider-info-section">';
-            $html .= '<h4 class="fct-rider-title">Delivery Person</h4>';
-            $html .= '<div class="fct-rider-details">';
+            $html  .= '<div class="fct-rider-info-section">';
+            $html  .= '<h4 class="fct-rider-title">Delivery Person</h4>';
+            $html  .= '<div class="fct-rider-details">';
 
             if ($rider->avatar_url) {
                 $html .= '<div class="fct-rider-avatar">';
@@ -180,26 +164,22 @@ class FluentCartOrderTrackingHandler
         return $html;
     }
 
-    /**
-     * Enqueue tracking assets for FluentCart pages
-     */
     public static function enqueueTrackingAssets()
     {
-        // Check if this is a FluentCart page in multiple ways
-        if (!self::isFluentCartCustomerPage()) {
+        if ( ! self::isFluentCartCustomerPage()) {
             return;
         }
 
         self::enqueueTrackingCss();
     }
 
-    /**
-     * Enqueue tracking CSS - can be called directly when needed
-     */
     public static function enqueueTrackingCss()
     {
         // Prevent duplicate enqueuing
-        if (wp_style_is('fluent-shipment-cart-tracking', 'enqueued') || wp_style_is('fluent-shipment-cart-tracking', 'done')) {
+        if (wp_style_is('fluent-shipment-cart-tracking', 'enqueued') || wp_style_is(
+                'fluent-shipment-cart-tracking',
+                'done'
+            )) {
             return;
         }
 
@@ -216,15 +196,10 @@ class FluentCartOrderTrackingHandler
         );
     }
 
-    /**
-     * Check if this is a FluentCart customer profile page
-     * 
-     * @return bool
-     */
     private static function isFluentCartCustomerPage()
     {
         // Check if FluentCart is active
-        if (!function_exists('fluent_cart') && !defined('FLUENTCART_VERSION')) {
+        if ( ! function_exists('fluent_cart') && ! defined('FLUENTCART_VERSION')) {
             return false;
         }
 
@@ -258,12 +233,6 @@ class FluentCartOrderTrackingHandler
         return $isFluentCartPage;
     }
 
-    /**
-     * Get status display label
-     * 
-     * @param string $status
-     * @return string
-     */
     private static function getStatusLabel($status)
     {
         $labels = [
@@ -280,23 +249,17 @@ class FluentCartOrderTrackingHandler
         return $labels[$status] ?? ucfirst(str_replace('_', ' ', $status));
     }
 
-    /**
-     * Get status CSS class
-     * 
-     * @param string $status
-     * @return string
-     */
     private static function getStatusClass($status)
     {
         $classes = [
-            'pending' => 'fct-status-pending',
-            'processing' => 'fct-status-processing',
-            'shipped' => 'fct-status-shipped',
-            'in_transit' => 'fct-status-transit',
+            'pending'          => 'fct-status-pending',
+            'processing'       => 'fct-status-processing',
+            'shipped'          => 'fct-status-shipped',
+            'in_transit'       => 'fct-status-transit',
             'out_for_delivery' => 'fct-status-delivery',
-            'delivered' => 'fct-status-delivered', 
-            'failed' => 'fct-status-failed',
-            'cancelled' => 'fct-status-cancelled',
+            'delivered'        => 'fct-status-delivered',
+            'failed'           => 'fct-status-failed',
+            'cancelled'        => 'fct-status-cancelled',
         ];
 
         return $classes[$status] ?? 'fct-status-default';

@@ -8,11 +8,8 @@ use FluentShipment\App\Helpers\DateTimeHelper;
 class Rider extends Model
 {
     protected $table = 'fluent_shipment_riders';
-
     protected $primaryKey = 'id';
-
     public $timestamps = true;
-
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -49,16 +46,16 @@ class Rider extends Model
     ];
 
     protected $casts = [
-        'rating' => 'float',
-        'total_deliveries' => 'integer',
+        'rating'                => 'float',
+        'total_deliveries'      => 'integer',
         'successful_deliveries' => 'integer',
-        'joining_date' => 'date',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'address' => 'array',
-        'emergency_contact' => 'array',
-        'documents' => 'array',
-        'meta' => 'array',
+        'joining_date'          => 'date',
+        'created_at'            => 'datetime',
+        'updated_at'            => 'datetime',
+        'address'               => 'array',
+        'emergency_contact'     => 'array',
+        'documents'             => 'array',
+        'meta'                  => 'array',
     ];
 
     protected $appends = [
@@ -69,65 +66,47 @@ class Rider extends Model
         'full_profile',
     ];
 
-    /**
-     * Get status label attribute
-     */
     public function getStatusLabelAttribute(): string
     {
         return static::getStatusLabels()[$this->status] ?? ucfirst($this->status);
     }
 
-    /**
-     * Get vehicle type label attribute
-     */
     public function getVehicleTypeLabelAttribute(): string
     {
         return static::getVehicleTypeLabels()[$this->vehicle_type] ?? ucfirst($this->vehicle_type);
     }
 
-    /**
-     * Get success rate attribute
-     */
     public function getSuccessRateAttribute(): float
     {
         if ($this->total_deliveries == 0) {
             return 0.0;
         }
-        
+
         return round(($this->successful_deliveries / $this->total_deliveries) * 100, 2);
     }
 
-    /**
-     * Get formatted rating attribute
-     */
     public function getFormattedRatingAttribute(): string
     {
         return number_format($this->rating, 1) . '/5.0';
     }
 
-    /**
-     * Get full profile attribute
-     */
     public function getFullProfileAttribute(): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->rider_name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'status' => $this->status,
-            'status_label' => $this->status_label,
-            'vehicle_info' => $this->vehicle_type_label . ($this->vehicle_number ? " ({$this->vehicle_number})" : ''),
-            'rating' => $this->formatted_rating,
-            'success_rate' => $this->success_rate . '%',
+            'id'               => $this->id,
+            'name'             => $this->rider_name,
+            'email'            => $this->email,
+            'phone'            => $this->phone,
+            'status'           => $this->status,
+            'status_label'     => $this->status_label,
+            'vehicle_info'     => $this->vehicle_type_label . ($this->vehicle_number ? " ({$this->vehicle_number})" : ''),
+            'rating'           => $this->formatted_rating,
+            'success_rate'     => $this->success_rate . '%',
             'total_deliveries' => $this->total_deliveries,
-            'avatar_url' => $this->avatar_url,
+            'avatar_url'       => $this->avatar_url,
         ];
     }
 
-    /**
-     * Get all possible statuses
-     */
     public static function getStatuses(): array
     {
         return [
@@ -137,21 +116,15 @@ class Rider extends Model
         ];
     }
 
-    /**
-     * Get status labels
-     */
     public static function getStatusLabels(): array
     {
         return [
-            static::STATUS_ACTIVE => 'Active',
-            static::STATUS_INACTIVE => 'Inactive',
+            static::STATUS_ACTIVE    => 'Active',
+            static::STATUS_INACTIVE  => 'Inactive',
             static::STATUS_SUSPENDED => 'Suspended',
         ];
     }
 
-    /**
-     * Get vehicle types
-     */
     public static function getVehicleTypes(): array
     {
         return [
@@ -163,86 +136,60 @@ class Rider extends Model
         ];
     }
 
-    /**
-     * Get vehicle type labels
-     */
     public static function getVehicleTypeLabels(): array
     {
         return [
-            static::VEHICLE_BIKE => 'Bike',
+            static::VEHICLE_BIKE       => 'Bike',
             static::VEHICLE_MOTORCYCLE => 'Motorcycle',
-            static::VEHICLE_CAR => 'Car',
-            static::VEHICLE_VAN => 'Van',
-            static::VEHICLE_TRUCK => 'Truck',
+            static::VEHICLE_CAR        => 'Car',
+            static::VEHICLE_VAN        => 'Van',
+            static::VEHICLE_TRUCK      => 'Truck',
         ];
     }
 
-    /**
-     * Update rider rating
-     */
     public function updateRating(float $newRating): bool
     {
         $this->rating = max(0, min(5, $newRating));
+
         return $this->save();
     }
 
-    /**
-     * Increment delivery counters
-     */
     public function incrementDeliveries(bool $successful = true): bool
     {
         $this->total_deliveries++;
-        
+
         if ($successful) {
             $this->successful_deliveries++;
         }
-        
+
         return $this->save();
     }
 
-    /**
-     * Scope to filter by status
-     */
     public function scopeOfStatus($query, $status)
     {
         return $query->where('status', $status);
     }
 
-    /**
-     * Scope to filter by vehicle type
-     */
     public function scopeOfVehicleType($query, $vehicleType)
     {
         return $query->where('vehicle_type', $vehicleType);
     }
 
-    /**
-     * Scope to get active riders
-     */
     public function scopeActive($query)
     {
         return $query->where('status', static::STATUS_ACTIVE);
     }
 
-    /**
-     * Scope to get inactive riders
-     */
     public function scopeInactive($query)
     {
         return $query->where('status', static::STATUS_INACTIVE);
     }
 
-    /**
-     * Scope to get suspended riders
-     */
     public function scopeSuspended($query)
     {
         return $query->where('status', static::STATUS_SUSPENDED);
     }
 
-    /**
-     * Scope to search riders
-     */
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($q) use ($search) {
@@ -254,21 +201,15 @@ class Rider extends Model
         });
     }
 
-    /**
-     * Scope to get top rated riders
-     */
     public function scopeTopRated($query, $limit = 10)
     {
         return $query->orderBy('rating', 'desc')
-                    ->limit($limit);
+                     ->limit($limit);
     }
 
-    /**
-     * Format address for display
-     */
     public function getFormattedAddress(): string
     {
-        if (!$this->address) {
+        if ( ! $this->address) {
             return 'N/A';
         }
 
@@ -283,17 +224,14 @@ class Rider extends Model
         return implode(', ', $parts);
     }
 
-    /**
-     * Get emergency contact info
-     */
     public function getEmergencyContactInfo(): string
     {
-        if (!$this->emergency_contact) {
+        if ( ! $this->emergency_contact) {
             return 'N/A';
         }
 
-        $name = $this->emergency_contact['name'] ?? '';
-        $phone = $this->emergency_contact['phone'] ?? '';
+        $name     = $this->emergency_contact['name'] ?? '';
+        $phone    = $this->emergency_contact['phone'] ?? '';
         $relation = $this->emergency_contact['relation'] ?? '';
 
         $info = $name;
@@ -307,9 +245,6 @@ class Rider extends Model
         return $info ?: 'N/A';
     }
 
-    /**
-     * Check if rider is available for new deliveries
-     */
     public function isAvailable(): bool
     {
         return $this->status === static::STATUS_ACTIVE;
