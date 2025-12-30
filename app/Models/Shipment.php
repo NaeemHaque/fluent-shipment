@@ -79,6 +79,7 @@ class Shipment extends Model
         'formatted_shipping_cost',
         'is_trackable',
         'delivery_status',
+        'sender_info',
     ];
 
     public function trackingEvents(): HasMany
@@ -136,6 +137,11 @@ class Shipment extends Model
         }
 
         return 'pending';
+    }
+
+    public function getSenderInfoAttribute(): ?array
+    {
+        return $this->meta['sender'] ?? null;
     }
 
     public static function getStatuses(): array

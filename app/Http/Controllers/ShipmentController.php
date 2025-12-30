@@ -494,4 +494,93 @@ class ShipmentController extends Controller
             'failed'  => $failed,
         ];
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'customer_name'              => 'required|string|max:100',
+            'customer_email'             => 'required|email|max:100',
+            'customer_phone'             => 'nullable|string|max:20',
+            'sender_name'                => 'required|string|max:100',
+            'sender_email'               => 'nullable|email|max:100',
+            'sender_phone'               => 'nullable|string|max:20',
+            'shipping_address'           => 'required|array',
+            'shipping_address.name'      => 'required|string|max:100',
+            'shipping_address.address_1' => 'required|string|max:255',
+            'shipping_address.city'      => 'required|string|max:100',
+            'shipping_address.state'     => 'nullable|string|max:100',
+            'shipping_address.postcode'  => 'required|string|max:20',
+            'shipping_address.country'   => 'required|string|max:100',
+            'delivery_address'           => 'nullable|array',
+            'package_info'               => 'nullable|array',
+            'weight_total'               => 'nullable|numeric|min:0',
+            'dimensions'                 => 'nullable|array',
+            'shipping_cost'              => 'nullable|numeric|min:0',
+            'currency'                   => 'nullable|string|max:10',
+            'estimated_delivery'         => 'nullable|date',
+            'special_instructions'       => 'nullable|string|max:500',
+        ]);
+
+        $estimatedDelivery = $request->getSafe('estimated_delivery', 'sanitize_text_field');
+        if ($estimatedDelivery && strtotime($estimatedDelivery) < strtotime('today')) {
+            return [
+                'success' => false,
+                'message' => 'Estimated delivery date cannot be in the past',
+            ];
+        }
+
+        $trackingNumber = ShipmentService::generateTrackingNumber('manual');
+
+        $shippingAddress = $request->getSafe('shipping_address', 'fluentShipmentSanitizeArray');
+        $deliveryAddress = $request->getSafe('delivery_address', 'fluentShipmentSanitizeArray');
+
+        if (empty($deliveryAddress)) {
+            $deliveryAddress = $shippingAddress;
+        }
+
+        $shipmentData = [
+            'order_id'             => 0,
+            'order_source'         => Shipment::SOURCE_MANUAL,
+            'tracking_number'      => $trackingNumber,
+            'current_status'       => Shipment::STATUS_PENDING,
+            'shipping_address'     => $shippingAddress,
+            'delivery_address'     => $deliveryAddress,
+            'customer_email'       => $request->getSafe('customer_email', 'sanitize_email'),
+            'customer_phone'       => $request->getSafe('customer_phone', 'sanitize_text_field'),
+            'weight_total'         => $request->getSafe('weight_total', 'floatval'),
+            'dimensions'           => $request->getSafe('dimensions', 'fluentShipmentSanitizeArray'),
+            'shipping_cost'        => $request->getSafe('shipping_cost', 'floatval', 0) * 100, // Convert to cents
+            'currency'             => $request->getSafe('currency', 'sanitize_text_field', 'USD'),
+            'estimated_delivery'   => $request->getSafe('estimated_delivery', 'sanitize_text_field') ?: ShipmentService::calculateEstimatedDelivery(),
+            'special_instructions' => $request->getSafe('special_instructions', 'sanitize_text_field'),
+            'package_info'         => $request->getSafe('package_info', 'fluentShipmentSanitizeArray'),
+            'meta'                 => [
+                'sender' => [
+                    'name'  => $request->getSafe('sender_name', 'sanitize_text_field'),
+                    'email' => $request->getSafe('sender_email', 'sanitize_email'),
+                    'phone' => $request->getSafe('sender_phone', 'sanitize_text_field'),
+                ]
+            ],
+        ];
+
+        $shipment = Shipment::create($shipmentData);
+
+        if (!$shipment) {
+            return [
+                'success' => false,
+                'message' => 'Failed to create shipment',
+            ];
+        }
+
+        $shipment->createTrackingEvent(Shipment::STATUS_PENDING, [
+            'description' => 'Manual shipment created',
+            'location'    => 'Origin',
+        ]);
+
+        return [
+            'success'  => true,
+            'message'  => 'Shipment created successfully',
+            'shipment' => $shipment->load('trackingEvents'),
+        ];
+    }
 }

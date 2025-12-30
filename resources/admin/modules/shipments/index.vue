@@ -4,6 +4,10 @@
             <div class="page-header">
                <h3>All Shipments</h3>
                <div class="page-actions">
+                   <el-button @click="showCreateDialog = true" style="border-radius: 6px;">
+                       Create Shipment
+                   </el-button>
+
                    <el-button 
                        type="primary" 
                        @click="showImportDialog = true"
@@ -100,13 +104,16 @@
                             <el-table-column type="selection" width="55" />
                             <el-table-column prop="id" label="ID" width="80" sortable />
 
-                            <el-table-column label="Product">
+                            <el-table-column prop="order_id" label="Order" width="100">
                                 <template #default="scope">
-                                    <div v-if="scope.row?.package_info">
-                                        <div v-for="item in scope.row.package_info?.items" :key="item.product_id">
-                                            {{ item.name }}
-                                        </div>
-                                    </div>
+                                    <el-tag size="small" v-if="scope.row.order_id > 0">#{{ scope.row.order_id }}</el-tag>
+                                    <el-tag size="small" type="info" v-else>N/A</el-tag>
+                                </template>
+                            </el-table-column>
+                            
+                            <el-table-column prop="order_source" label="Source" width="130">
+                                <template #default="scope">
+                                    <span style="text-transform: capitalize;">{{ scope.row.order_source.replace('-', ' ') }}</span>
                                 </template>
                             </el-table-column>
 
@@ -124,12 +131,6 @@
                                             <i class="el-icon-link"></i>
                                         </el-button>
                                     </div>
-                                </template>
-                            </el-table-column>
-
-                            <el-table-column prop="order_id" label="Order" width="100">
-                                <template #default="scope">
-                                    <el-tag size="small">#{{ scope.row.order_id }}</el-tag>
                                 </template>
                             </el-table-column>
 
@@ -215,6 +216,209 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Create Shipment Dialog -->
+            <el-dialog
+                title="Create Shipment"
+                v-model="showCreateDialog"
+                width="900px"
+                :close-on-click-modal="false"
+            >
+                <el-form 
+                    :model="createForm" 
+                    label-width="140px" 
+                    label-position="top"
+                    v-loading="creating"
+                >
+                    <el-row :gutter="24">
+                        <!-- Sender Information -->
+                        <el-col :span="12">
+                            <el-card shadow="never" style="margin-bottom: 20px;">
+                                <template #header>
+                                    <div class="card-header">
+                                        <span>Sender Information</span>
+                                    </div>
+                                </template>
+                                
+                                <el-form-item label="Sender Name" required>
+                                    <el-input v-model="createForm.sender_name" placeholder="Shop/Company name" />
+                                </el-form-item>
+                                
+                                <el-form-item label="Sender Email">
+                                    <el-input v-model="createForm.sender_email" placeholder="sender@example.com" />
+                                </el-form-item>
+                                
+                                <el-form-item label="Sender Phone">
+                                    <el-input v-model="createForm.sender_phone" placeholder="+1234567890" />
+                                </el-form-item>
+                            </el-card>
+                        </el-col>
+                        
+                        <!-- Customer Information -->
+                        <el-col :span="12">
+                            <el-card shadow="never" style="margin-bottom: 20px;">
+                                <template #header>
+                                    <div class="card-header">
+                                        <span>Customer Information</span>
+                                    </div>
+                                </template>
+                                
+                                <el-form-item label="Customer Name" required>
+                                    <el-input v-model="createForm.customer_name" placeholder="Customer full name" />
+                                </el-form-item>
+                                
+                                <el-form-item label="Customer Email" required>
+                                    <el-input v-model="createForm.customer_email" placeholder="customer@example.com" />
+                                </el-form-item>
+                                
+                                <el-form-item label="Customer Phone">
+                                    <el-input v-model="createForm.customer_phone" placeholder="+1234567890" />
+                                </el-form-item>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                    
+                    <!-- Shipping Address -->
+                    <el-card shadow="never" style="margin-bottom: 20px;">
+                        <template #header>
+                            <div class="card-header">
+                                <span>Shipping Address</span>
+                            </div>
+                        </template>
+                        
+                        <el-row :gutter="16">
+                            <el-col :span="24">
+                                <el-form-item label="Full Name" required>
+                                    <el-input v-model="createForm.shipping_address.name" placeholder="Recipient name" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="12">
+                                <el-form-item label="Address Line 1" required>
+                                    <el-input v-model="createForm.shipping_address.address_1" placeholder="Street address" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="12">
+                                <el-form-item label="Address Line 2">
+                                    <el-input v-model="createForm.shipping_address.address_2" placeholder="Apartment, unit, etc" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="8">
+                                <el-form-item label="City" required>
+                                    <el-input v-model="createForm.shipping_address.city" placeholder="City" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="8">
+                                <el-form-item label="State/Province">
+                                    <el-input v-model="createForm.shipping_address.state" placeholder="State" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="8">
+                                <el-form-item label="Postal Code" required>
+                                    <el-input v-model="createForm.shipping_address.postcode" placeholder="ZIP/Postal code" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="12">
+                                <el-form-item label="Country" required>
+                                    <el-input v-model="createForm.shipping_address.country" placeholder="Country" />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+                    
+                    <!-- Package Information -->
+                    <el-card shadow="never" style="margin-bottom: 20px;">
+                        <template #header>
+                            <div class="card-header">
+                                <span>Package Details (Optional)</span>
+                            </div>
+                        </template>
+                        
+                        <el-row :gutter="16">
+                            <el-col :span="12">
+                                <el-form-item label="Weight (kg)">
+                                    <el-input-number v-model="createForm.weight_total" :min="0" :precision="2" style="width: 100%" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="12">
+                                <el-form-item label="Shipping Cost">
+                                    <el-input-number v-model="createForm.shipping_cost" :min="0" :precision="2" style="width: 100%" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="8">
+                                <el-form-item label="Length (cm)">
+                                    <el-input-number v-model="createForm.dimensions.length" :min="0" style="width: 100%" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="8">
+                                <el-form-item label="Width (cm)">
+                                    <el-input-number v-model="createForm.dimensions.width" :min="0" style="width: 100%" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="8">
+                                <el-form-item label="Height (cm)">
+                                    <el-input-number v-model="createForm.dimensions.height" :min="0" style="width: 100%" />
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="12">
+                                <el-form-item label="Currency">
+                                    <el-select v-model="createForm.currency" placeholder="Select currency" style="width: 100%">
+                                        <el-option label="USD - US Dollar" value="USD"></el-option>
+                                        <el-option label="EUR - Euro" value="EUR"></el-option>
+                                        <el-option label="GBP - British Pound" value="GBP"></el-option>
+                                        <el-option label="CAD - Canadian Dollar" value="CAD"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="12">
+                                <el-form-item label="Estimated Delivery">
+                                    <el-date-picker
+                                        v-model="createForm.estimated_delivery"
+                                        type="date"
+                                        placeholder="Estimated delivery date"
+                                        format="YYYY-MM-DD"
+                                        value-format="YYYY-MM-DD"
+                                        style="width: 100%"
+                                        :disabled-date="(time) => time.getTime() < Date.now() - 8.64e7"
+                                    ></el-date-picker>
+                                </el-form-item>
+                            </el-col>
+                            
+                            <el-col :span="24">
+                                <el-form-item label="Special Instructions">
+                                    <el-input 
+                                        v-model="createForm.special_instructions" 
+                                        type="textarea" 
+                                        rows="3"
+                                        placeholder="Any special delivery instructions..."
+                                    />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+                </el-form>
+                
+                <template #footer>
+                    <span class="dialog-footer">
+                        <el-button @click="resetCreateForm">Cancel</el-button>
+                        <el-button type="primary" @click="createShipment" :loading="creating">
+                            Create Shipment
+                        </el-button>
+                    </span>
+                </template>
+            </el-dialog>
+
 
             <!-- Import Dialog -->
             <el-dialog
@@ -309,7 +513,9 @@
                                                 {{ getStatusLabel(selectedShipment.current_status) }}
                                             </el-tag>
                                         </p>
-                                        <p><strong>Order ID:</strong> #{{ selectedShipment.order_id }}</p>
+                                        <p v-if="selectedShipment.order_id > 0"><strong>Order ID:</strong> #{{ selectedShipment.order_id }}</p>
+                                        <p v-else><strong>Type:</strong> Manual Shipment</p>
+                                        <p v-if="selectedShipment.sender_info?.name"><strong>Sender:</strong> {{ selectedShipment.sender_info.name }}</p>
                                         <p><strong>Created:</strong> {{ formatDateTime(selectedShipment.created_at) }}</p>
                                     </el-col>
                                     <el-col :span="12">
@@ -523,6 +729,7 @@ export default {
             importing: false,
             updating: false,
             bulkUpdating: false,
+            creating: false,
             loadingStats: false,
             loadingEvents: false,
             loadingRiders: false,
@@ -547,6 +754,7 @@ export default {
             },
             
             // Dialog states
+            showCreateDialog: false,
             showImportDialog: false,
             showViewDialog: false,
             showEditDialog: false,
@@ -576,6 +784,34 @@ export default {
                 status: '',
                 location: '',
                 description: ''
+            },
+
+            createForm: {
+                sender_name: '',
+                sender_email: '',
+                sender_phone: '',
+                customer_name: '',
+                customer_email: '',
+                customer_phone: '',
+                shipping_address: {
+                    name: '',
+                    address_1: '',
+                    address_2: '',
+                    city: '',
+                    state: '',
+                    postcode: '',
+                    country: ''
+                },
+                weight_total: null,
+                shipping_cost: null,
+                currency: 'USD',
+                dimensions: {
+                    length: null,
+                    width: null,
+                    height: null
+                },
+                estimated_delivery: '',
+                special_instructions: ''
             },
 
             // Filter tabs
@@ -1142,6 +1378,105 @@ export default {
                 'truck': 'Truck'
             };
             return labels[vehicleType] || vehicleType || 'N/A';
+        },
+
+        // Create shipment methods
+        createShipment() {
+            if (!this.validateCreateForm()) {
+                return;
+            }
+
+            this.creating = true;
+
+            const data = {
+                ...this.createForm,
+                shipping_address: {
+                    ...this.createForm.shipping_address,
+                    name: this.createForm.shipping_address.name || this.createForm.customer_name
+                }
+            };
+
+            this.$post('shipments', data)
+                .then(res => {
+                    if (res.success) {
+                        this.$notify({
+                            title: 'Success',
+                            message: 'Shipment created successfully',
+                            type: 'success'
+                        });
+                        this.resetCreateForm();
+                        this.fetchShipments();
+                    }
+                })
+                .catch(err => {
+                    this.$notifyError('Failed to create shipment: ' + err.message);
+                })
+                .finally(() => {
+                    this.creating = false;
+                });
+        },
+
+        resetCreateForm() {
+            this.createForm = {
+                sender_name: '',
+                sender_email: '',
+                sender_phone: '',
+                customer_name: '',
+                customer_email: '',
+                customer_phone: '',
+                shipping_address: {
+                    name: '',
+                    address_1: '',
+                    address_2: '',
+                    city: '',
+                    state: '',
+                    postcode: '',
+                    country: ''
+                },
+                weight_total: null,
+                shipping_cost: null,
+                currency: 'USD',
+                dimensions: {
+                    length: null,
+                    width: null,
+                    height: null
+                },
+                estimated_delivery: '',
+                special_instructions: ''
+            };
+            this.showCreateDialog = false;
+        },
+
+        validateCreateForm() {
+            if (!this.createForm.sender_name) {
+                this.$notifyError('Sender name is required');
+                return false;
+            }
+            if (!this.createForm.customer_name) {
+                this.$notifyError('Customer name is required');
+                return false;
+            }
+            if (!this.createForm.customer_email) {
+                this.$notifyError('Customer email is required');
+                return false;
+            }
+            if (!this.createForm.shipping_address.address_1) {
+                this.$notifyError('Shipping address is required');
+                return false;
+            }
+            if (!this.createForm.shipping_address.city) {
+                this.$notifyError('City is required');
+                return false;
+            }
+            if (!this.createForm.shipping_address.postcode) {
+                this.$notifyError('Postal code is required');
+                return false;
+            }
+            if (!this.createForm.shipping_address.country) {
+                this.$notifyError('Country is required');
+                return false;
+            }
+            return true;
         }
     },
 

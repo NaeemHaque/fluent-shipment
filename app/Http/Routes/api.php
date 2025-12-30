@@ -8,12 +8,11 @@ use FluentShipment\App\Http\Controllers\DashboardController;
 use FluentShipment\App\Http\Controllers\ShipmentController;
 use FluentShipment\App\Http\Controllers\RiderController;
 
-
 $router->get('/dashboard', [DashboardController::class, 'index']);
 
 $router->prefix('/shipments')->group(function () use ($router) {
-    // List shipments
     $router->get('/', [ShipmentController::class, 'index']);
+    $router->post('/', [ShipmentController::class, 'store']);
     
     // FluentCart integration
     $router->post('/import/fluent-cart', [ShipmentController::class, 'importFromFluentCart']);
@@ -34,22 +33,11 @@ $router->prefix('/shipments')->group(function () use ($router) {
 });
 
 $router->prefix('/riders')->group(function () use ($router) {
-    // List riders
     $router->get('/', [RiderController::class, 'index']);
-    
-    // Create new rider
     $router->post('/', [RiderController::class, 'store']);
-    
-    // Get rider statistics
     $router->get('/stats', [RiderController::class, 'stats']);
-    
-    // Get active riders for assignments
     $router->get('/active', [RiderController::class, 'getActiveRiders']);
-    
-    // Search riders
     $router->get('/search', [RiderController::class, 'search']);
-    
-    // Bulk operations
     $router->post('/bulk/update-status', [RiderController::class, 'bulkUpdateStatus']);
     
     // Individual rider operations
