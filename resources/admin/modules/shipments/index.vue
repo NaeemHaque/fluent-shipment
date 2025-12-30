@@ -787,7 +787,8 @@ export default {
                         this.$notify({
                             title: 'Success',
                             message: 'Shipments deleted successfully',
-                            type: 'success'
+                            type: 'success',
+                            duration: 0
                         });
                         this.selectedRows = [];
                         this.fetchShipments();
@@ -911,7 +912,8 @@ export default {
                         this.$notify({
                             title: 'Import Complete',
                             message: `Successfully imported ${created} shipments. ${skipped} orders were skipped.`,
-                            type: 'success'
+                            type: 'success',
+                            duration: 0
                         });
                         
                         // Reset dialog

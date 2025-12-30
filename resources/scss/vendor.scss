@@ -346,6 +346,10 @@
             border: 1px solid var(--fluentshipment-primary-border) !important;
             color: var(--fluentshipment-primary-text) !important;
             border-radius: 8px;
+
+            &__icon {
+                color: var(--fluentshipment-primary-text) !important;
+            }
         }
         &-drawer {
             &__header {

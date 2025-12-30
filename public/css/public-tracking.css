@@ -39,16 +39,15 @@
     display: flex;
     width: 100%;
     max-width: 500px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
     background: white;
-    border: 2px solid #e1e8ed;
+    border: 2px solid #374550;
     transition: border-color 0.3s ease;
 }
 
 .fs-search-input-group:focus-within {
-    border-color: #3498db;
+    border-color: #253241;
 }
 
 .fs-search-input {
@@ -66,7 +65,7 @@
 
 .fs-search-button {
     padding: 15px 25px;
-    background: #3498db;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #253241;
     color: white;
     border: none;
     cursor: pointer;
@@ -77,7 +76,7 @@
 }
 
 .fs-search-button:hover {
-    background: #2980b9;
+    background: #253241;
 }
 
 .fs-search-button:disabled {
@@ -121,22 +120,27 @@
 .fs-tracking-success {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     margin: 20px 0;
+    border: 1px solid #e9ecef;
 }
 
 /* Shipment Header */
 .fs-shipment-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 25px 30px;
+    padding: 20px;
+    border-bottom: 1px solid #D6DAE1;
+    background: #f0f3f5;;
+}
+
+.fs-shipment-info {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .fs-shipment-title {
-    font-size: 1.3rem;
-    margin: 0 0 10px 0;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .fs-tracking-number {
@@ -144,40 +148,51 @@
     background: rgba(255, 255, 255, 0.2);
     padding: 4px 8px;
     border-radius: 4px;
+    color: #3b82f6;
 }
 
 .fs-current-status {
-    margin-top: 15px;
+    /*margin-top: 15px;*/
 }
 
 .fs-status-label {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 20px;
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 /* Status Colors */
-.status-pending { background: #f39c12; color: white; }
-.status-processing { background: #3498db; color: white; }
-.status-shipped { background: #9b59b6; color: white; }
-.status-transit { background: #16a085; color: white; }
-.status-delivery { background: #e67e22; color: white; }
-.status-delivered { background: #27ae60; color: white; }
-.status-failed { background: #e74c3c; color: white; }
-.status-cancelled { background: #95a5a6; color: white; }
-.status-returned { background: #f39c12; color: white; }
-.status-exception { background: #e74c3c; color: white; }
-.status-default { background: #bdc3c7; color: white; }
+.status-pending { background: #f39c12;}
+.status-processing { background: #3498db; }
+.status-shipped { background: #9b59b6; }
+.status-transit { background: #16a085; }
+.status-delivery { background: #e67e22; }
+.status-delivered { background: #27ae60; }
+.status-failed { background: #e74c3c; }
+.status-cancelled { background: #95a5a6; }
+.status-returned { background: #f39c12; }
+.status-exception { background: #e74c3c; }
+.status-default { background: #bdc3c7; }
+
+.fs-timeline-status.status-pending,
+.fs-timeline-status.status-processing,
+.fs-timeline-status.status-shipped,
+.fs-timeline-status.status-transit,
+.fs-timeline-status.status-delivery,
+.fs-timeline-status.status-delivered,
+.fs-timeline-status.status-failed,
+.fs-timeline-status.status-cancelled,
+.fs-timeline-status.status-default {
+    background-color: unset;
+}
 
 /* Shipment Details */
 .fs-shipment-details {
     padding: 25px 30px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid #D6DAE1;
 }
 
 .fs-detail-grid {
@@ -276,12 +291,12 @@
 }
 
 .fs-timeline-content {
-    padding-left: 30px;
     background: white;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     border-left: 3px solid #e9ecef;
+    margin-left: 20px;
 }
 
 .fs-timeline-current .fs-timeline-content {

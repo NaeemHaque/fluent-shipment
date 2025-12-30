@@ -127,9 +127,9 @@
             html += `
                 <div class="fs-shipment-header">
                     <div class="fs-shipment-info">
-                        <h3 class="fs-shipment-title">
+                        <div class="fs-shipment-title">
                             Tracking Number: <span class="fs-tracking-number">${this.escapeHtml(shipment.tracking_number)}</span>
-                        </h3>
+                        </div>
                         <div class="fs-current-status">
                             <span class="fs-status-label ${this.getStatusClass(shipment.current_status)}">
                                 ${this.getStatusLabel(shipment.current_status)}

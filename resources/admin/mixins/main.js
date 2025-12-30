@@ -110,24 +110,37 @@ export default {
             }
 
             let type = 'error';
-            
+            let title = 'Error';
             let errorMessage = '';
 
             if (typeof e === 'string') {
                 errorMessage = e;
-            } else if ('message' in e) {
-                errorMessage = e.message;
-            } else {
+            } else if (typeof e === 'object' && e !== null) {
+                if ('message' in e) {
+                    errorMessage = e.message;
+                } else if ('data' in e && typeof e.data === 'object') {
+                    // Handle API error response format
+                    errorMessage = e.data.message || convertToText(e.data);
+                } else {
+                    errorMessage = convertToText(e);
+                }
+
                 if (e.isAborted) {
                     type = 'warning';
+                    title = 'Warning';
                     errorMessage = e.message || 'Request aborted.';
                 } else if (e.status === 401) {
                     type = 'warning';
+                    title = 'Unauthorized';
+                    errorMessage = e.message || 'Access denied.';
+                } else if (e.status === 404) {
+                    type = 'warning';
+                    title = 'Not Found';
                     errorMessage = e.message || 'Resource not found.';
                 }
             }
 
-            notify(type, 'Error', errorMessage || 'Something went wrong');
+            notify(type, title, errorMessage || 'Something went wrong');
         },
         $url(url) {
             return config.rest.url.replace(
@@ -135,8 +148,20 @@ export default {
             ) + '/' + url.replace(/^\/+/, '');
         },
         $notify(message, type = 'info', position = 'top-right') {
-            const title = type === 'info' ? 'Notification' : type;
-            notify(type, capitalize(title), message, position);
+            // Handle object format: { title, message, type, position }
+            if (typeof message === 'object' && message !== null) {
+                const options = message;
+                notify(
+                    options.type || type,
+                    options.title || capitalize(options.type || type),
+                    options.message || '',
+                    options.position || position
+                );
+            } else {
+                // Handle string format: $notify(message, type, position)
+                const title = type === 'info' ? 'Notification' : type;
+                notify(type, capitalize(title), message, position);
+            }
         },
         $notifySuccess(message, position = 'top-right') {
             notify('success', 'Success', message, position);
