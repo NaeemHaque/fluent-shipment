@@ -4,6 +4,7 @@ namespace FluentShipment\App\Http\Controllers;
 
 use FluentShipment\App\Models\User;
 use FluentShipment\Framework\Http\Request\Request;
+use FluentShipment\Database\DBMigrator;
 
 class DashboardController extends Controller
 {
@@ -54,4 +55,24 @@ class DashboardController extends Controller
         ];
 
 	}
+
+    /**
+     * Run database migrations (development helper)
+     */
+    public function runMigrations()
+    {
+        try {
+            DBMigrator::migrateUp();
+            
+            return [
+                'success' => true,
+                'message' => 'Database migrations completed successfully',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Migration failed: ' . $e->getMessage(),
+            ];
+        }
+    }
 }

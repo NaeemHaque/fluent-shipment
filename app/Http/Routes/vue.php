@@ -17,6 +17,15 @@ $router->menu('primary', function($router) {
            ->icon('Memo')
            ->title(__('Shipments', 'fluent-shipment'));
 
+    $router->add('riders', 'modules/riders')
+           ->name('riders')
+           ->icon('User')
+           ->title(__('Riders', 'fluent-shipment'));
+           
+    $router->add('riders/profile/:riderId', 'modules/riders/RiderProfile')
+           ->name('riders.profile')
+           ->props(true);
+
 //    $router->add('posts-all', 'modules/posts')
 //        ->name('posts.all')
 //        ->icon('Memo')
