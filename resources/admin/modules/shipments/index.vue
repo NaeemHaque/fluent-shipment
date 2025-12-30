@@ -61,7 +61,7 @@
                                 <div class="bulk-actions-inline" v-if="selectedRows.length > 0">
                                     <div class="bulk-actions-content">
                                         <span class="selected-count">{{ selectedRows.length }} selected</span>
-                                        <el-button size="small" @click="bulkUpdateStatus">
+                                        <el-button size="small" @click="bulkUpdateStatus" type="primary">
                                             <el-icon><Edit /></el-icon>
                                             Update Status
                                         </el-button>
@@ -230,7 +230,7 @@
                 </template>
 
                 <div class="import-form">
-                    <el-form :model="importForm" label-width="140px">
+                    <el-form :model="importForm" label-width="140px" label-position="top">
                         
                         <el-form-item label="Payment Status">
                             <el-select v-model="importForm.payment_status" placeholder="Filter by payment status">
@@ -268,6 +268,10 @@
                             ></el-date-picker>
                         </el-form-item>
                     </el-form>
+
+                    <div class="import-help">
+                        <el-alert title="Keep blank for importing all" type="info" :closable="false" style="border-radius: 8px;" />
+                    </div>
                     
                 </div>
 
@@ -346,12 +350,13 @@
                 v-model="showEditDialog"
                 width="500px"
             >
-                <el-form :model="editForm" label-width="120px" v-if="selectedShipment">
-                    <el-form-item label="Current Status">
-                        <el-tag :type="getStatusType(selectedShipment.current_status)">
-                            {{ getStatusLabel(selectedShipment.current_status) }}
-                        </el-tag>
-                    </el-form-item>
+                <el-form :model="editForm" label-width="120px" v-if="selectedShipment" label-position="top">
+                   <div class="current-status">
+                       <span>Current Status:</span>
+                       <el-tag :type="getStatusType(selectedShipment.current_status)">
+                           {{ getStatusLabel(selectedShipment.current_status) }}
+                       </el-tag>
+                   </div>
                     
                     <el-form-item label="New Status">
                         <el-select v-model="editForm.status" placeholder="Select status">
@@ -393,7 +398,7 @@
                 v-model="showBulkEditDialog"
                 width="500px"
             >
-                <el-form :model="bulkEditForm" label-width="120px">
+                <el-form :model="bulkEditForm" label-width="120px" label-position="top">
                     <el-form-item label="Selected">
                         <span>{{ selectedRows.length }} shipments</span>
                     </el-form-item>

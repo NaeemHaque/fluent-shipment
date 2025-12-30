@@ -9,11 +9,15 @@
         color: var(--fluentshipment-secondary-text);
     }
     .el {
+        &-main {
+            padding: 0;
+        }
         &-select {
             .el-select__wrapper {
                 width: 100%;
                 background-color: transparent;
                 box-shadow: 0 0 0 1px var(--fluentshipment-primary-border) inset;
+                border-radius: 8px;
             }
 
             input {
@@ -71,8 +75,9 @@
                 background-color: var(--fluentshipment-primary-bg);
                 border-bottom: 1px solid var(--fluentshipment-primary-border);
                 color: var(--fluentshipment-secondary-text);
+                margin: 0;
                 .is-active {
-                    background: var(--fluentshipment-active-bg);
+                    //background: var(--fluentshipment-active-bg);
                 }
             }
             .el-tabs__nav-next, .el-tabs__nav-prev {
@@ -88,6 +93,11 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+            }
+
+            &__item {
+                color: var(--fluentshipment-primary-text);
+                padding: 10px;
             }
         }
 
@@ -240,6 +250,7 @@
 
         &-input,
         &-textarea {
+            width: 100%;
             --el-input-text-color: var(--fluentshipment-secondary-text, #0e121b);
             background-color: transparent;
             --el-fill-color-blank: transparent;
@@ -250,6 +261,10 @@
         &-input__inner {
             padding: 0 !important;
             color: var(--fluentshipment-secondary-text, #0e121b);
+        }
+
+        &-input__wrapper {
+            border-radius: 8px;
         }
 
         &-overlay {
