@@ -3,28 +3,26 @@
  * Version: 1.0.0
  */
 
-(function($) {
+(function ($) {
     'use strict';
 
-    // Main tracking object
     const FluentShipmentTracking = {
-        
-        // Initialize the tracking functionality
-        init: function() {
+
+        init: function () {
             this.bindEvents();
             this.checkUrlParams();
         },
 
         // Bind all event handlers
-        bindEvents: function() {
+        bindEvents: function () {
             // Form submission
             $('#fs-tracking-form').on('submit', this.handleFormSubmit.bind(this));
-            
+
             // Real-time search as user types (debounced)
             // $('#fs-tracking-input').on('input', this.debounce(this.handleRealtimeSearch.bind(this), 500));
-            
+
             // Enter key handling
-            $('#fs-tracking-input').on('keypress', function(e) {
+            $('#fs-tracking-input').on('keypress', function (e) {
                 if (e.which === 13) {
                     e.preventDefault();
                     $('#fs-tracking-form').trigger('submit');
@@ -33,10 +31,10 @@
         },
 
         // Check if tracking number is in URL parameters
-        checkUrlParams: function() {
+        checkUrlParams: function () {
             const urlParams = new URLSearchParams(window.location.search);
             const tracking = urlParams.get('tracking');
-            
+
             if (tracking && tracking.trim()) {
                 $('#fs-tracking-input').val(tracking.trim());
                 // Don't auto-submit, let the PHP handle the display
@@ -44,11 +42,11 @@
         },
 
         // Handle form submission
-        handleFormSubmit: function(e) {
+        handleFormSubmit: function (e) {
             e.preventDefault();
-            
+
             const trackingNumber = $('#fs-tracking-input').val().trim();
-            
+
             if (!trackingNumber) {
                 this.showError('Please enter a tracking number');
                 return;
@@ -60,22 +58,19 @@
         },
 
         // Handle real-time search (optional enhancement)
-        handleRealtimeSearch: function() {
+        handleRealtimeSearch: function () {
             const trackingNumber = $('#fs-tracking-input').val().trim();
-            
-            // Only search if we have a complete-looking tracking number
+
             if (trackingNumber.length < 6) {
                 return;
             }
-            
+
             this.performAjaxSearch(trackingNumber);
         },
 
-        // Perform AJAX search
-        performAjaxSearch: function(trackingNumber) {
-            // Show loading state
+        performAjaxSearch: function (trackingNumber) {
             this.showLoading();
-            
+
             $.ajax({
                 url: fluentShipmentPublic.ajaxUrl,
                 method: 'POST',
@@ -90,8 +85,7 @@
             });
         },
 
-        // Handle successful AJAX response
-        handleAjaxSuccess: function(response) {
+        handleAjaxSuccess: function (response) {
             if (response.success) {
                 this.displayResults(response.data);
             } else {
@@ -99,30 +93,27 @@
             }
         },
 
-        // Handle AJAX error
-        handleAjaxError: function(xhr, status, error) {
+        handleAjaxError: function (xhr, status, error) {
             console.error('Tracking AJAX Error:', error);
             this.showError(fluentShipmentPublic.strings.error);
         },
 
-        // Display search results
-        displayResults: function(data) {
+        displayResults: function (data) {
             const resultsHtml = this.buildResultsHtml(data);
             $('#fs-tracking-results').html(resultsHtml).show();
-            
+
             // Scroll to results
             $('html, body').animate({
                 scrollTop: $('#fs-tracking-results').offset().top - 20
             }, 500);
         },
 
-        // Build HTML for tracking results
-        buildResultsHtml: function(data) {
+        buildResultsHtml: function (data) {
             const shipment = data.shipment;
             const events = data.events;
-            
+
             let html = '<div class="fs-tracking-success">';
-            
+
             // Shipment Header
             html += `
                 <div class="fs-shipment-header">
@@ -138,10 +129,10 @@
                     </div>
                 </div>
             `;
-            
+
             // Shipment Details
             html += '<div class="fs-shipment-details"><div class="fs-detail-grid">';
-            
+
             if (shipment.carrier) {
                 html += `
                     <div class="fs-detail-item">
@@ -150,7 +141,7 @@
                     </div>
                 `;
             }
-            
+
             if (shipment.estimated_delivery) {
                 html += `
                     <div class="fs-detail-item">
@@ -159,14 +150,14 @@
                     </div>
                 `;
             }
-            
+
             html += `
                 <div class="fs-detail-item">
                     <label>Ship Date:</label>
                     <span>${this.formatDate(shipment.created_at)}</span>
                 </div>
             `;
-            
+
             if (shipment.delivery_address) {
                 html += `
                     <div class="fs-detail-item fs-detail-full">
@@ -175,20 +166,20 @@
                     </div>
                 `;
             }
-            
+
             html += '</div></div>';
-            
+
             // Tracking Timeline
             if (events && events.length > 0) {
                 html += '<div class="fs-tracking-timeline">';
                 html += '<h4 class="fs-timeline-title">Tracking History</h4>';
                 html += '<div class="fs-timeline">';
-                
+
                 events.forEach((event, index) => {
                     const isFirst = index === 0;
                     const isLast = index === events.length - 1;
                     const isMilestone = event.is_milestone;
-                    
+
                     html += `
                         <div class="fs-timeline-item ${isFirst ? 'fs-timeline-current' : ''} ${isMilestone ? 'fs-timeline-milestone' : ''}">
                             <div class="fs-timeline-marker">
@@ -205,51 +196,46 @@
                                     </span>
                                 </div>
                     `;
-                    
+
                     if (event.description) {
                         html += `<div class="fs-timeline-description">${this.escapeHtml(event.description)}</div>`;
                     }
-                    
+
                     if (event.location) {
                         html += `<div class="fs-timeline-location">📍 ${this.escapeHtml(event.location)}</div>`;
                     }
-                    
+
                     html += '</div></div>';
                 });
-                
+
                 html += '</div></div>';
             }
-            
+
             html += '</div>';
-            
+
             return html;
         },
 
-        // Show loading state
-        showLoading: function() {
+        showLoading: function () {
             $('#fs-tracking-loading').show();
             $('#fs-tracking-results').hide();
-            
-            // Update button state
+
             const $button = $('.fs-search-button');
             $button.prop('disabled', true);
             $button.find('.fs-search-text').hide();
             $button.find('.fs-search-loading').show();
         },
 
-        // Hide loading state
-        hideLoading: function() {
+        hideLoading: function () {
             $('#fs-tracking-loading').hide();
-            
-            // Reset button state
+
             const $button = $('.fs-search-button');
             $button.prop('disabled', false);
             $button.find('.fs-search-text').show();
             $button.find('.fs-search-loading').hide();
         },
 
-        // Show error message
-        showError: function(message) {
+        showError: function (message) {
             const errorHtml = `
                 <div class="fs-tracking-error">
                     <div class="fs-error-icon">📦</div>
@@ -257,12 +243,12 @@
                     <p>${this.escapeHtml(message)}</p>
                 </div>
             `;
-            
+
             $('#fs-tracking-results').html(errorHtml).show();
         },
 
         // Utility: Debounce function
-        debounce: function(func, wait) {
+        debounce: function (func, wait) {
             let timeout;
             return function executedFunction(...args) {
                 const later = () => {
@@ -275,13 +261,13 @@
         },
 
         // Utility: Update URL parameter
-        updateUrlParam: function(url, param, paramVal) {
+        updateUrlParam: function (url, param, paramVal) {
             let newAdditionalURL = "";
             let tempArray = url.split("?");
             let baseURL = tempArray[0];
             let additionalURL = tempArray[1];
             let temp = "";
-            
+
             if (additionalURL) {
                 tempArray = additionalURL.split("&");
                 for (let i = 0; i < tempArray.length; i++) {
@@ -291,13 +277,13 @@
                     }
                 }
             }
-            
+
             let rowsText = temp + "" + param + "=" + paramVal;
             return baseURL + "?" + newAdditionalURL + rowsText;
         },
 
         // Utility: Escape HTML
-        escapeHtml: function(text) {
+        escapeHtml: function (text) {
             const map = {
                 '&': '&amp;',
                 '<': '&lt;',
@@ -305,16 +291,18 @@
                 '"': '&quot;',
                 "'": '&#039;'
             };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            return text.replace(/[&<>"']/g, function (m) {
+                return map[m];
+            });
         },
 
         // Utility: Capitalize first letter
-        capitalizeFirst: function(str) {
+        capitalizeFirst: function (str) {
             return str.charAt(0).toUpperCase() + str.slice(1);
         },
 
         // Utility: Format date
-        formatDate: function(dateString) {
+        formatDate: function (dateString) {
             const date = new Date(dateString);
             return date.toLocaleDateString('en-US', {
                 year: 'numeric',
@@ -324,7 +312,7 @@
         },
 
         // Get status label
-        getStatusLabel: function(status) {
+        getStatusLabel: function (status) {
             const labels = {
                 'pending': 'Pending',
                 'processing': 'Processing',
@@ -337,12 +325,12 @@
                 'returned': 'Returned',
                 'exception': 'Exception'
             };
-            
+
             return labels[status] || this.capitalizeFirst(status.replace('_', ' '));
         },
 
         // Get status CSS class
-        getStatusClass: function(status) {
+        getStatusClass: function (status) {
             const classes = {
                 'pending': 'status-pending',
                 'processing': 'status-processing',
@@ -355,20 +343,17 @@
                 'returned': 'status-returned',
                 'exception': 'status-exception'
             };
-            
+
             return classes[status] || 'status-default';
         }
     };
 
-    // Initialize when document is ready
-    $(document).ready(function() {
-        // Only initialize if the tracking container exists
+    $(document).ready(function () {
         if ($('#fluent-shipment-tracking').length) {
             FluentShipmentTracking.init();
         }
     });
 
-    // Expose to global scope for external access
     window.FluentShipmentTracking = FluentShipmentTracking;
 
 })(jQuery);

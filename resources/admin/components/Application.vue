@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import Rest from '@/utils/http/Rest';
 import Nav from '@/components/Menu/Menu';
 import menu from '@/components/Menu/menu';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
@@ -60,16 +59,6 @@ export default {
             required: true
         }
     },
-    data() {
-        return {
-            // Menu will be reactive through computed properties
-        };
-    },
-    provide() {
-        return {
-            // ...
-        };
-    },
     computed: {
         primaryMenu() {
             return menu.get('primary') || [];
@@ -77,37 +66,7 @@ export default {
         secondaryMenu() {
             return menu.get('secondary') || [];
         },
-        footerMenu() {
-            return menu.get('footer') || [];
-        },
     },
-    methods: {
-        registerRestRequestInterceptor() {
-            Rest.use((options, next) => {
-                options.headers = {
-                    ...options.headers,
-                    'X-Fluent': 'Fluent-Custom-Header',
-                };
-                
-                return next(options);
-            });
-        },
-        updateApplication(data = null) {
-            // ...
-        },
-    },
-    mounted() {
-        this.registerRestRequestInterceptor();
-    },
-    watch: {
-        primaryMenu: {
-            handler(newVal) {
-                if (typeof __DEV__ !== 'undefined' && __DEV__) {
-                }
-            },
-            immediate: true
-        }
-    }
 };
 </script>
 

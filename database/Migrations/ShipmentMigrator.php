@@ -8,14 +8,13 @@ class ShipmentMigrator
     {
         global $wpdb;
 
-        // Ensure dbDelta function is available
         if (!function_exists('dbDelta')) {
             require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         }
 
         $charsetCollate = $wpdb->get_charset_collate();
-        $table = $wpdb->prefix . 'fluent_shipments';
-        $indexPrefix = $wpdb->prefix . 'fs_';
+        $table          = $wpdb->prefix . 'fluent_shipments';
+        $indexPrefix    = $wpdb->prefix . 'fs_';
 
         $sql = "CREATE TABLE $table (
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -77,8 +76,8 @@ class ShipmentMigrator
         global $wpdb;
 
         $charsetCollate = $wpdb->get_charset_collate();
-        $table = $wpdb->prefix . 'fluent_shipment_tracking_events';
-        $indexPrefix = $wpdb->prefix . 'fste_';
+        $table          = $wpdb->prefix . 'fluent_shipment_tracking_events';
+        $indexPrefix    = $wpdb->prefix . 'fste_';
 
         $sql = "CREATE TABLE $table (
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -153,11 +152,11 @@ class ShipmentMigrator
     public static function dropTable()
     {
         global $wpdb;
-        
+
         $shipmentsTable = $wpdb->prefix . 'fluent_shipments';
-        $eventsTable = $wpdb->prefix . 'fluent_shipment_tracking_events';
-        $ridersTable = $wpdb->prefix . 'fluent_shipment_riders';
-        
+        $eventsTable    = $wpdb->prefix . 'fluent_shipment_tracking_events';
+        $ridersTable    = $wpdb->prefix . 'fluent_shipment_riders';
+
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
         $wpdb->query("DROP TABLE IF EXISTS $eventsTable");
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
