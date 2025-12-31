@@ -66,7 +66,10 @@ class ShipmentController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('tracking_number', 'LIKE', "%{$search}%")
                   ->orWhere('customer_email', 'LIKE', "%{$search}%")
-                  ->orWhere('order_id', 'LIKE', "%{$search}%")
+                  ->orWhere(function($subQ) use ($search) {
+                      $subQ->whereNotNull('order_id')
+                           ->where('order_id', 'LIKE', "%{$search}%");
+                  })
                   ->orWhereRaw("JSON_EXTRACT(delivery_address, '$.name') LIKE ?", ["%{$search}%"]);
             });
         }
@@ -539,7 +542,7 @@ class ShipmentController extends Controller
         }
 
         $shipmentData = [
-            'order_id'             => 0,
+            'order_id'             => null,
             'order_source'         => Shipment::SOURCE_MANUAL,
             'tracking_number'      => $trackingNumber,
             'current_status'       => Shipment::STATUS_PENDING,

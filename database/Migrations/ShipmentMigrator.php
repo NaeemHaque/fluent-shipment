@@ -18,7 +18,7 @@ class ShipmentMigrator
 
         $sql = "CREATE TABLE $table (
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                order_id BIGINT UNSIGNED NOT NULL,
+                order_id BIGINT UNSIGNED NULL,
                 order_source VARCHAR(50) NOT NULL DEFAULT 'fluent-cart',
                 order_hash VARCHAR(100) NULL,
                 tracking_number VARCHAR(100) NOT NULL,
@@ -55,7 +55,11 @@ class ShipmentMigrator
                 INDEX `{$indexPrefix}rider_id` (rider_id),
                 INDEX `{$indexPrefix}carrier` (carrier),
                 INDEX `{$indexPrefix}created_at` (created_at),
-                UNIQUE KEY `{$indexPrefix}unique_order_shipment` (order_id, order_source)
+                UNIQUE KEY `{$indexPrefix}unique_order_shipment` (order_id, order_source),
+                CONSTRAINT chk_order_source CHECK (
+                    (order_source != 'manual' AND order_id IS NOT NULL) OR 
+                    (order_source = 'manual')
+                )
             ) $charsetCollate;";
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching

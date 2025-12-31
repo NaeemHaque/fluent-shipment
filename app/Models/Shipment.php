@@ -81,6 +81,7 @@ class Shipment extends Model
         'is_trackable',
         'delivery_status',
         'sender_info',
+        'display_order_id',
     ];
 
     public function trackingEvents(): HasMany
@@ -143,6 +144,11 @@ class Shipment extends Model
     public function getSenderInfoAttribute(): ?array
     {
         return $this->meta['sender'] ?? null;
+    }
+
+    public function getDisplayOrderIdAttribute(): string
+    {
+        return $this->order_id ? (string)$this->order_id : 'N/A';
     }
 
     public static function getStatuses(): array

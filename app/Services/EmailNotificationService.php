@@ -312,9 +312,9 @@ class EmailNotificationService
         return implode('<br>', array_filter($parts));
     }
 
-    protected static function formatPackageItems(array $packageInfo): string
+    protected static function formatPackageItems(?array $packageInfo): string
     {
-        if (empty($packageInfo['items'])) {
+        if (empty($packageInfo) || empty($packageInfo['items'])) {
             return '<p style="margin: 0;">No package details available.</p>';
         }
 
@@ -346,7 +346,7 @@ class EmailNotificationService
         return $html;
     }
 
-    protected static function formatSenderInfo(array $sender = null): string
+    protected static function formatSenderInfo(?array $sender = null): string
     {
         if (empty($sender)) {
             return '<p style="margin: 0;">Sender information not available.</p>';
@@ -371,7 +371,7 @@ class EmailNotificationService
         return $html;
     }
 
-    protected static function formatRiderInfo(array $rider = null): string
+    protected static function formatRiderInfo(?array $rider = null): string
     {
         if (empty($rider)) {
             return '<p style="margin: 0;">Delivery agent information not available.</p>';
