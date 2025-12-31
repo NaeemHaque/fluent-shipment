@@ -198,7 +198,7 @@ class EmailNotificationService
 
                 ' . ($data['tracking_url'] ? '
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="' . esc_url($data['tracking_url']) . '" style="display: inline-block; background-color: #007cba; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Track Your Shipment</a>
+                    <a href="' . esc_url($data['tracking_url']) . '" target="_blank" style="display: inline-block; background-color: #007cba; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Track Your Shipment</a>
                 </div>
                 ' : '') . '
 
@@ -424,25 +424,39 @@ class EmailNotificationService
 
     protected static function getFromEmail(): string
     {
-        return apply_filters(
-            'fluentshipment_email_from',
-            get_option('fluentshipment_email_from', get_bloginfo('admin_email'))
-        );
+        $emailSettings = static::getEmailSettings();
+        
+        return apply_filters('fluentshipment_email_from', $emailSettings['from_email']);
     }
 
     protected static function getFromName(): string
     {
-        return apply_filters(
-            'fluentshipment_email_from_name',
-            get_option('fluentshipment_email_from_name', get_bloginfo('name'))
-        );
+        $emailSettings = static::getEmailSettings();
+        
+        return apply_filters('fluentshipment_email_from_name', $emailSettings['from_name']);
     }
 
     protected static function isEmailEnabled(string $type): bool
     {
-        $option = 'fluentshipment_email_' . $type . '_enabled';
+        $emailSettings = static::getEmailSettings();
 
-        return (bool)get_option($option, true);
+        return (bool)($emailSettings['notifications'][$type] ?? true);
+    }
+
+    protected static function getEmailSettings(): array
+    {
+        $defaults = [
+            'notifications' => [
+                'processing' => true,
+                'delivered'  => true,
+            ],
+            'from_email'    => get_bloginfo('admin_email'),
+            'from_name'     => get_bloginfo('name'),
+        ];
+
+        $settings = get_option('fluentshipment_email_settings', []);
+
+        return wp_parse_args($settings, $defaults);
     }
 
     public static function getEmailTypes(): array
@@ -455,9 +469,10 @@ class EmailNotificationService
 
     public static function enableEmail(string $type, bool $enabled = true): bool
     {
-        $option = 'fluentshipment_email_' . $type . '_enabled';
-
-        return update_option($option, $enabled);
+        $emailSettings = static::getEmailSettings();
+        $emailSettings['notifications'][$type] = $enabled;
+        
+        return update_option('fluentshipment_email_settings', $emailSettings);
     }
 
     public static function isAnyEmailEnabled(): bool

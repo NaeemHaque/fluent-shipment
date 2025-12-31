@@ -250,6 +250,15 @@ class Shipment extends Model
             return $this->tracking_url;
         }
 
+        if ($this->tracking_number) {
+            $generalSettings = get_option('fluentshipment_general_settings', []);
+            $trackingPageUrl = $generalSettings['tracking_page_url'] ?? '';
+            
+            if ($trackingPageUrl) {
+                return $trackingPageUrl . '?tracking=' . $this->tracking_number;
+            }
+        }
+
         return null;
     }
 

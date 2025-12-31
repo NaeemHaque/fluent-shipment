@@ -24,6 +24,15 @@
             <div v-if="activeTab === 'general'" class="settings-tab">
                 <div class="settings-nav">
                     <h3>General Settings</h3>
+                    <div class="settings-nav-actions">
+                        <el-button
+                            type="primary"
+                            @click="saveGeneralSettings"
+                            :loading="saving"
+                        >
+                            Save Settings
+                        </el-button>
+                    </div>
                 </div>
                 <div class="settings-content">
                     <div class="settings-item">
@@ -36,6 +45,25 @@
                             [fluent-shipment]
                         </div>
                     </div>
+
+                    <div class="settings-item">
+                        <div class="settings-item-content">
+                            <div class="shortcode-title">Tracking Page URL</div>
+                            <p class="shortcode-description">The URL where customers can track their shipments.</p>
+                        </div>
+                        <div class="settings-item-content">
+                            <el-form :model="generalSettings" v-loading="saving">
+                                <el-form-item>
+                                    <el-input
+                                        v-model="generalSettings.tracking_page_url"
+                                        placeholder="http://yoursite.com/tracking/"
+                                        type="url"
+                                        clearable
+                                    />
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -43,11 +71,19 @@
             <div v-if="activeTab === 'email'" class="settings-tab">
                 <div class="settings-nav">
                     <h3>Email Notification Settings</h3>
+                    <div class="settings-nav-actions">
+                        <el-button
+                            type="primary"
+                            @click="saveEmailSettings"
+                            :loading="saving"
+                        >
+                            Save Settings
+                        </el-button>
+                    </div>
                 </div>
                 <div class="settings-content" v-loading="loading">
                     <!-- Email Notifications -->
                     <div class="settings-section">
-                        <h4>Automatic Email Notifications</h4>
                         <div class="settings-item">
                             <div class="settings-item-content">
                                 <div class="setting-title">Processing Notification</div>
@@ -68,23 +104,35 @@
                                 @change="updateEmailSettings"
                             />
                         </div>
-                    </div>
 
-                    <!-- Sender Settings -->
-                    <div class="settings-section">
-                        <h4>Email Sender Settings</h4>
                         <div class="settings-item">
                             <div class="settings-item-content">
-                                <el-form :model="emailSettings" label-width="140px">
-                                    <el-form-item label="From Email">
-                                        <el-input 
+                                <div class="setting-title">From Email</div>
+                                <p class="setting-description">Email address to send from</p>
+                            </div>
+                            <div class="settings-item-content">
+                                <el-form :model="emailSettings">
+                                    <el-form-item>
+                                        <el-input
                                             v-model="emailSettings.email_from"
                                             placeholder="admin@yoursite.com"
                                             type="email"
                                         />
                                     </el-form-item>
-                                    <el-form-item label="From Name">
-                                        <el-input 
+                                </el-form>
+                            </div>
+                        </div>
+
+                        <div class="settings-item">
+                            <div class="settings-item-content">
+                                <div class="setting-title">From Name</div>
+                                <p class="setting-description">Name to send from</p>
+                            </div>
+
+                            <div class="settings-item-content">
+                                <el-form :model="emailSettings">
+                                    <el-form-item>
+                                        <el-input
                                             v-model="emailSettings.email_from_name"
                                             placeholder="Your Company Name"
                                         />
@@ -94,6 +142,7 @@
                         </div>
                     </div>
 
+
                     <!-- Test Email -->
                     <div class="settings-section">
                         <h4>Test Email</h4>
@@ -102,7 +151,7 @@
                                 <p class="setting-description">Send a test email to verify your configuration</p>
                                 <el-form inline>
                                     <el-form-item>
-                                        <el-input 
+                                        <el-input
                                             v-model="testEmail"
                                             placeholder="test@example.com"
                                             style="width: 200px;"
@@ -115,7 +164,7 @@
                                         </el-select>
                                     </el-form-item>
                                     <el-form-item>
-                                        <el-button 
+                                        <el-button
                                             type="primary"
                                             @click="sendTestEmail"
                                             :loading="sendingTest"
@@ -126,17 +175,6 @@
                                 </el-form>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Save Button -->
-                    <div class="settings-actions">
-                        <el-button 
-                            type="primary"
-                            @click="saveEmailSettings"
-                            :loading="saving"
-                        >
-                            Save Settings
-                        </el-button>
                     </div>
                 </div>
             </div>
@@ -165,6 +203,9 @@ export default {
                 },
                 email_from: '',
                 email_from_name: ''
+            },
+            generalSettings: {
+                tracking_page_url: ''
             }
         }
     },
@@ -176,12 +217,16 @@ export default {
     mounted() {
         if (this.activeTab === 'email') {
             this.loadEmailSettings();
+        } else if (this.activeTab === 'general') {
+            this.loadGeneralSettings();
         }
     },
     watch: {
         activeTab(newTab) {
             if (newTab === 'email') {
                 this.loadEmailSettings();
+            } else if (newTab === 'general') {
+                this.loadGeneralSettings();
             }
         }
     },
@@ -243,6 +288,34 @@ export default {
             this.sendingTest = false;
         },
 
+        async loadGeneralSettings() {
+            this.loading = true;
+            try {
+                const response = await this.$get('/settings/general');
+                if (response) {
+                    this.generalSettings = response.settings;
+                }
+            } catch (error) {
+                this.$notifyError('Failed to load general settings');
+            }
+            this.loading = false;
+        },
+
+        async saveGeneralSettings() {
+            this.saving = true;
+            try {
+                const response = await this.$post('/settings/general', this.generalSettings);
+                if (response) {
+                    this.$notifySuccess('General settings saved successfully');
+                } else {
+                    this.$notifyError('Failed to save settings');
+                }
+            } catch (error) {
+                this.$notifyError('Failed to save general settings');
+            }
+            this.saving = false;
+        },
+
         copyShortcode(text = this.shortcode) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text)
@@ -285,107 +358,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.fluent-shipment-settings-menu {
-    .fluent-shipment_tab_item {
-        cursor: pointer;
-        padding: 12px 16px;
-        margin-bottom: 8px;
-        border-radius: 6px;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        &:hover {
-            background-color: #f0f2f5;
-        }
-
-        &.active {
-            background-color: var(--el-color-primary);
-            color: white;
-        }
-    }
-}
-
-.settings-section {
-    margin-bottom: 32px;
-
-    h4 {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--fluentshipment-primary-text);
-        margin-bottom: 16px;
-        border-bottom: 1px solid #e6e6e6;
-        padding-bottom: 8px;
-    }
-}
-
-.settings-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #f0f0f0;
-
-    &:last-child {
-        border-bottom: none;
-    }
-}
-
-.settings-item-content {
-    flex: 1;
-}
-
-.setting-title {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--fluentshipment-primary-text);
-    margin-bottom: 4px;
-}
-
-.setting-description {
-    font-size: 13px;
-    color: var(--fluentshipment-secondary-text);
-    margin: 0;
-}
-
-.shortcode-title {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--fluentshipment-primary-text);
-}
-
-.shortcode-description {
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--fluentshipment-secondary-text);
-    margin-top: 8px;
-}
-
-.shortcode {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f0f2f5;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #19283a;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover {
-        background: #e6e8eb;
-    }
-}
-
-.settings-actions {
-    border-top: 1px solid #e6e6e6;
-    padding-top: 20px;
-    margin-top: 24px;
-}
-
 .el-form {
     .el-form-item {
         margin-bottom: 16px;

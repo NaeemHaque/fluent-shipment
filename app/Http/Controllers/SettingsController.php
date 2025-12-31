@@ -11,12 +11,13 @@ class SettingsController extends Controller
 {
     public function getEmailSettings()
     {
-        $emailTypes = EmailNotificationService::getEmailTypes();
-        $settings   = [];
+        $emailSettings = $this->getEmailSettingsData();
+        $emailTypes    = EmailNotificationService::getEmailTypes();
 
+        $notifications = [];
         foreach ($emailTypes as $type => $label) {
-            $settings[$type] = [
-                'enabled' => get_option('fluentshipment_email_' . $type . '_enabled', true),
+            $notifications[$type] = [
+                'enabled' => $emailSettings['notifications'][$type] ?? true,
                 'label'   => $label,
             ];
         }
@@ -24,9 +25,9 @@ class SettingsController extends Controller
         return [
             'success'  => true,
             'settings' => [
-                'email_notifications' => $settings,
-                'email_from'          => get_option('fluentshipment_email_from', get_bloginfo('admin_email')),
-                'email_from_name'     => get_option('fluentshipment_email_from_name', get_bloginfo('name')),
+                'email_notifications' => $notifications,
+                'email_from'          => $emailSettings['from_email'],
+                'email_from_name'     => $emailSettings['from_name'],
             ],
         ];
     }
@@ -39,26 +40,29 @@ class SettingsController extends Controller
             'email_from_name'     => 'string|max:255',
         ]);
 
+        $emailSettings = $this->getEmailSettingsData();
+        
         $emailNotifications = $request->getSafe('email_notifications', 'fluentShipmentSanitizeArray', []);
         $emailFrom          = $request->getSafe('email_from', 'sanitize_email');
         $emailFromName      = $request->getSafe('email_from_name', 'sanitize_text_field');
 
-        if ( ! empty($emailNotifications)) {
+        if (!empty($emailNotifications)) {
             foreach ($emailNotifications as $type => $settings) {
                 if (isset($settings['enabled'])) {
-                    $enabled = rest_sanitize_boolean($settings['enabled']);
-                    update_option('fluentshipment_email_' . sanitize_key($type) . '_enabled', $enabled);
+                    $emailSettings['notifications'][sanitize_key($type)] = rest_sanitize_boolean($settings['enabled']);
                 }
             }
         }
 
         if ($emailFrom) {
-            update_option('fluentshipment_email_from', $emailFrom);
+            $emailSettings['from_email'] = $emailFrom;
         }
 
         if ($emailFromName) {
-            update_option('fluentshipment_email_from_name', $emailFromName);
+            $emailSettings['from_name'] = $emailFromName;
         }
+
+        update_option('fluentshipment_email_settings', $emailSettings);
 
         return [
             'success' => true,
@@ -68,44 +72,45 @@ class SettingsController extends Controller
 
     public function getGeneralSettings()
     {
+        $generalSettings = $this->getGeneralSettingsData();
+        
         return [
             'success'  => true,
-            'settings' => [
-                'default_estimated_delivery_days' => get_option('fluentshipment_default_delivery_days', 5),
-                'auto_create_tracking_number'     => get_option('fluentshipment_auto_tracking_number', true),
-                'tracking_number_prefix'          => get_option('fluentshipment_tracking_prefix', 'FS'),
-                'enable_customer_tracking'        => get_option('fluentshipment_customer_tracking', true),
-                'require_delivery_confirmation'   => get_option('fluentshipment_delivery_confirmation', false),
-                'default_currency'                => get_option('fluentshipment_default_currency', 'USD'),
-            ],
+            'settings' => $generalSettings,
         ];
     }
 
     public function updateGeneralSettings(Request $request)
     {
         $request->validate([
-            'default_estimated_delivery_days' => 'integer|min:1|max:365',
-            'auto_create_tracking_number'     => 'boolean',
-            'tracking_number_prefix'          => 'string|max:10',
-            'enable_customer_tracking'        => 'boolean',
-            'require_delivery_confirmation'   => 'boolean',
-            'default_currency'                => 'string|max:3',
+            'tracking_page_url' => 'nullable|string|max:500',
         ]);
 
-        $settings = [
-            'default_estimated_delivery_days' => $request->getSafe('default_estimated_delivery_days', 'intval'),
-            'auto_create_tracking_number'     => $request->getSafe('auto_create_tracking_number', 'rest_sanitize_boolean'),
-            'tracking_number_prefix'          => $request->getSafe('tracking_number_prefix', 'sanitize_text_field'),
-            'enable_customer_tracking'        => $request->getSafe('enable_customer_tracking', 'rest_sanitize_boolean'),
-            'require_delivery_confirmation'   => $request->getSafe('require_delivery_confirmation', 'rest_sanitize_boolean'),
-            'default_currency'                => $request->getSafe('default_currency', 'sanitize_text_field'),
-        ];
+        $generalSettings = $this->getGeneralSettingsData();
 
-        foreach ($settings as $key => $value) {
-            if ($value !== null) {
-                update_option('fluentshipment_' . $key, $value);
-            }
+        if ($request->has('default_estimated_delivery_days')) {
+            $generalSettings['default_estimated_delivery_days'] = $request->getSafe('default_estimated_delivery_days', 'intval');
         }
+        if ($request->has('auto_create_tracking_number')) {
+            $generalSettings['auto_create_tracking_number'] = $request->getSafe('auto_create_tracking_number', 'rest_sanitize_boolean');
+        }
+        if ($request->has('tracking_number_prefix')) {
+            $generalSettings['tracking_number_prefix'] = $request->getSafe('tracking_number_prefix', 'sanitize_text_field');
+        }
+        if ($request->has('enable_customer_tracking')) {
+            $generalSettings['enable_customer_tracking'] = $request->getSafe('enable_customer_tracking', 'rest_sanitize_boolean');
+        }
+        if ($request->has('require_delivery_confirmation')) {
+            $generalSettings['require_delivery_confirmation'] = $request->getSafe('require_delivery_confirmation', 'rest_sanitize_boolean');
+        }
+        if ($request->has('default_currency')) {
+            $generalSettings['default_currency'] = $request->getSafe('default_currency', 'sanitize_text_field');
+        }
+        if ($request->has('tracking_page_url')) {
+            $generalSettings['tracking_page_url'] = $request->getSafe('tracking_page_url', 'sanitize_url');
+        }
+
+        update_option('fluentshipment_general_settings', $generalSettings);
 
         return [
             'success' => true,
@@ -125,24 +130,37 @@ class SettingsController extends Controller
 
         $testShipment = $this->createTestShipment();
 
-        // Temporarily override customer email for testing
-        $originalEmail                = $testShipment->customer_email;
-        $testShipment->customer_email = $testEmail;
+        // Set the test email directly in attributes for the test
+        $testShipment->setAttribute('customer_email', $testEmail);
 
-        $success = EmailNotificationService::sendShipmentNotification($testShipment, $emailType);
+        try {
+            $success = EmailNotificationService::sendShipmentNotification($testShipment, $emailType);
 
-        // Restore original email
-        $testShipment->customer_email = $originalEmail;
-
-        if ($success) {
-            return [
-                'success' => true,
-                'message' => 'Test email sent successfully to ' . $testEmail,
-            ];
-        } else {
+            if ($success) {
+                return [
+                    'success' => true,
+                    'message' => 'Test email sent successfully to ' . $testEmail,
+                ];
+            } else {
+                // Check if email notifications are enabled for this type
+                $emailSettings = $this->getEmailSettingsData();
+                if (!($emailSettings['notifications'][$emailType] ?? true)) {
+                    return [
+                        'success' => false,
+                        'message' => 'Email notifications are disabled for ' . $emailType . ' type.',
+                    ];
+                }
+                
+                return [
+                    'success' => false,
+                    'message' => 'Failed to send test email. Please check your email configuration and WordPress mail settings.',
+                ];
+            }
+        } catch (\Exception $e) {
+            error_log('Test Email Error: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Failed to send test email. Please check your email configuration.',
+                'message' => 'Error sending test email: ' . $e->getMessage(),
             ];
         }
     }
@@ -208,6 +226,15 @@ class SettingsController extends Controller
 
             public function getTrackingUrl(): ?string
             {
+                if ($this->tracking_number) {
+                    $generalSettings = get_option('fluentshipment_general_settings', []);
+                    $trackingPageUrl = $generalSettings['tracking_page_url'] ?? '';
+
+                    if ($trackingPageUrl) {
+                        return $trackingPageUrl . '?tracking=' . $this->tracking_number;
+                    }
+                }
+
                 return 'https://example.com/track/' . $this->tracking_number;
             }
 
@@ -225,17 +252,11 @@ class SettingsController extends Controller
 
     public function getSmtpSettings()
     {
+        $smtpSettings = $this->getSmtpSettingsData();
+        
         return [
             'success'  => true,
-            'settings' => [
-                'smtp_enabled'    => get_option('fluentshipment_smtp_enabled', false),
-                'smtp_host'       => get_option('fluentshipment_smtp_host', ''),
-                'smtp_port'       => get_option('fluentshipment_smtp_port', 587),
-                'smtp_encryption' => get_option('fluentshipment_smtp_encryption', 'tls'),
-                'smtp_username'   => get_option('fluentshipment_smtp_username', ''),
-                'smtp_password'   => get_option('fluentshipment_smtp_password', ''),
-                'smtp_auth'       => get_option('fluentshipment_smtp_auth', true),
-            ],
+            'settings' => $smtpSettings,
         ];
     }
 
@@ -251,24 +272,34 @@ class SettingsController extends Controller
             'smtp_auth'       => 'boolean',
         ]);
 
-        $settings = [
-            'smtp_enabled'    => $request->getSafe('smtp_enabled', 'rest_sanitize_boolean'),
-            'smtp_host'       => $request->getSafe('smtp_host', 'sanitize_text_field'),
-            'smtp_port'       => $request->getSafe('smtp_port', 'intval'),
-            'smtp_encryption' => $request->getSafe('smtp_encryption', 'sanitize_text_field'),
-            'smtp_username'   => $request->getSafe('smtp_username', 'sanitize_text_field'),
-            'smtp_password'   => $request->getSafe('smtp_password', 'sanitize_text_field'),
-            'smtp_auth'       => $request->getSafe('smtp_auth', 'rest_sanitize_boolean'),
-        ];
+        $smtpSettings = $this->getSmtpSettingsData();
 
-        foreach ($settings as $key => $value) {
-            if ($value !== null) {
-                update_option('fluentshipment_' . $key, $value);
-            }
+        if ($request->has('smtp_enabled')) {
+            $smtpSettings['enabled'] = $request->getSafe('smtp_enabled', 'rest_sanitize_boolean');
+        }
+        if ($request->has('smtp_host')) {
+            $smtpSettings['host'] = $request->getSafe('smtp_host', 'sanitize_text_field');
+        }
+        if ($request->has('smtp_port')) {
+            $smtpSettings['port'] = $request->getSafe('smtp_port', 'intval');
+        }
+        if ($request->has('smtp_encryption')) {
+            $smtpSettings['encryption'] = $request->getSafe('smtp_encryption', 'sanitize_text_field');
+        }
+        if ($request->has('smtp_username')) {
+            $smtpSettings['username'] = $request->getSafe('smtp_username', 'sanitize_text_field');
+        }
+        if ($request->has('smtp_password')) {
+            $smtpSettings['password'] = $request->getSafe('smtp_password', 'sanitize_text_field');
+        }
+        if ($request->has('smtp_auth')) {
+            $smtpSettings['auth'] = $request->getSafe('smtp_auth', 'rest_sanitize_boolean');
         }
 
-        if ($settings['smtp_enabled']) {
-            $this->configureWordPressSmtp($settings);
+        update_option('fluentshipment_smtp_settings', $smtpSettings);
+
+        if ($smtpSettings['enabled']) {
+            $this->configureWordPressSmtp($smtpSettings);
         }
 
         return [
@@ -281,18 +312,68 @@ class SettingsController extends Controller
     {
         add_action('phpmailer_init', function ($phpmailer) use ($settings) {
             $phpmailer->isSMTP();
-            $phpmailer->Host     = $settings['smtp_host'];
-            $phpmailer->Port     = $settings['smtp_port'];
-            $phpmailer->SMTPAuth = $settings['smtp_auth'];
+            $phpmailer->Host     = $settings['host'];
+            $phpmailer->Port     = $settings['port'];
+            $phpmailer->SMTPAuth = $settings['auth'];
 
-            if ($settings['smtp_auth']) {
-                $phpmailer->Username = $settings['smtp_username'];
-                $phpmailer->Password = $settings['smtp_password'];
+            if ($settings['auth']) {
+                $phpmailer->Username = $settings['username'];
+                $phpmailer->Password = $settings['password'];
             }
 
-            if ($settings['smtp_encryption'] !== 'none') {
-                $phpmailer->SMTPSecure = $settings['smtp_encryption'];
+            if ($settings['encryption'] !== 'none') {
+                $phpmailer->SMTPSecure = $settings['encryption'];
             }
         });
+    }
+
+    private function getEmailSettingsData(): array
+    {
+        $defaults = [
+            'notifications' => [
+                'processing' => true,
+                'delivered'  => true,
+            ],
+            'from_email'    => get_bloginfo('admin_email'),
+            'from_name'     => get_bloginfo('name'),
+        ];
+
+        $settings = get_option('fluentshipment_email_settings', []);
+
+        return wp_parse_args($settings, $defaults);
+    }
+
+    private function getGeneralSettingsData(): array
+    {
+        $defaults = [
+            'default_estimated_delivery_days' => 5,
+            'auto_create_tracking_number'     => true,
+            'tracking_number_prefix'          => 'FS',
+            'enable_customer_tracking'        => true,
+            'require_delivery_confirmation'   => false,
+            'default_currency'                => 'USD',
+            'tracking_page_url'               => '',
+        ];
+
+        $settings = get_option('fluentshipment_general_settings', []);
+
+        return wp_parse_args($settings, $defaults);
+    }
+
+    private function getSmtpSettingsData(): array
+    {
+        $defaults = [
+            'enabled'    => false,
+            'host'       => '',
+            'port'       => 587,
+            'encryption' => 'tls',
+            'username'   => '',
+            'password'   => '',
+            'auth'       => true,
+        ];
+
+        $settings = get_option('fluentshipment_smtp_settings', []);
+
+        return wp_parse_args($settings, $defaults);
     }
 }

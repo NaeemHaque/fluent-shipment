@@ -13,7 +13,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
       font-size: 14px;
       font-weight: 500;
       color: var(--fluentshipment-primary-text);
@@ -23,6 +22,17 @@
       transition: color 0.3s ease;
       white-space: nowrap;
       border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+
+      &:hover {
+        background-color: #f0f2f5;
+      }
+
+      &.active {
+        background-color: var(--el-color-primary);
+        color: white;
+      }
     }
   }
 
@@ -34,11 +44,12 @@
     width: 100%;
 
     .settings-nav {
-        background: var(--fluentshipment-primary-bg);
-        border-bottom: 1px solid var(--fluentshipment-primary-border);
-        padding: 16px 32px;
-
-
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--fluentshipment-primary-bg);
+      border-bottom: 1px solid var(--fluentshipment-primary-border);
+      padding: 16px 32px;
     }
 
     .settings-content {
@@ -51,6 +62,78 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .settings-section {
+      margin-bottom: 32px;
+
+      h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--fluentshipment-primary-text);
+        margin-bottom: 16px;
+        border-bottom: 1px solid #e6e6e6;
+        padding-bottom: 8px;
+      }
+    }
+
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .settings-item-content {
+      flex: 1;
+    }
+
+    .setting-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--fluentshipment-primary-text);
+      margin-bottom: 4px;
+    }
+
+    .setting-description {
+      font-size: 13px;
+      color: var(--fluentshipment-secondary-text);
+      margin: 0;
+    }
+
+    .shortcode-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--fluentshipment-primary-text);
+    }
+
+    .shortcode-description {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--fluentshipment-secondary-text);
+      margin-top: 8px;
+    }
+
+    .shortcode {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f0f2f5;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #19283a;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background: #e6e8eb;
+      }
     }
   }
 
