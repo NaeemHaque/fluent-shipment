@@ -4,9 +4,9 @@
 Plugin Name: Fluent Shipment
 Description: Fluent Shipment WordPress Plugin
 Version: 1.0.0
-Author: 
+Author: Golam Sarwer Naeem
 Author URI: 
-Plugin URI: 
+Plugin URI: https://github.com/naeemHaque/fluent-shipment
 License: GPLv2 or later
 Text Domain: fluent-shipment
 Domain Path: /language
