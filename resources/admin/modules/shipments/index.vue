@@ -145,12 +145,32 @@
 
                             <el-table-column prop="customer_email" label="Customer">
                                 <template #default="scope">
-                                    <div>
-                                        <div>{{ scope.row.customer_email || 'N/A' }}</div>
-                                        <small style="color: #909399;">
-                                            {{ formatAddress(scope.row.delivery_address) }}
-                                        </small>
-                                    </div>
+                                    <el-tooltip placement="top" popper-class="fluentshipment_tooltip_popper">
+                                        <template #content>
+                                            <div>
+                                                <div>{{ scope.row.customer_email || 'N/A' }}</div>
+                                                <small style="color: #909399;">
+                                                    {{ formatAddress(scope.row.delivery_address) }}
+                                                </small>
+                                            </div>
+                                        </template>
+
+                                        <div class="credex_tooltip_trigger">
+                                            <div>
+                                                <div>{{ scope.row.customer_email || 'N/A' }}</div>
+                                                <small class="truncate" style="color: #909399;">
+                                                    {{ formatAddress(scope.row.delivery_address) }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </el-tooltip>
+
+<!--                                    <div>-->
+<!--                                        <div>{{ scope.row.customer_email || 'N/A' }}</div>-->
+<!--                                        <small style="color: #909399;">-->
+<!--                                            {{ formatAddress(scope.row.delivery_address) }}-->
+<!--                                        </small>-->
+<!--                                    </div>-->
                                 </template>
                             </el-table-column>
 

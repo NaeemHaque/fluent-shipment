@@ -35,19 +35,75 @@
                </el-skeleton>
            </div>
        </div>
+
+       <div class="main-content">
+           <div class="content-wrapper-left">
+               <!-- Chart Section -->
+               <div class="dashboard-card">
+                   <div class="card-header">
+                       <div class="card-title">Shipment Overview</div>
+                   </div>
+
+                   <div class="chart-container" v-if="!loading">
+                       <LineChart
+                           :chartData="chartData"
+                           :loading="loading"
+                       />
+                   </div>
+
+                   <div v-else class="chart-placeholder">
+                       <el-skeleton animated>
+                           <template #template>
+                               <el-skeleton-item variant="rect" style="height: 500px" />
+                           </template>
+                       </el-skeleton>
+                   </div>
+               </div>
+           </div>
+
+           <div class="content-wrapper-right">
+<!--               Recent Activity-->
+               <div class="dashboard-card">
+                   <div class="card-header">
+                       <div class="card-title">Recent Activity</div>
+                   </div>
+
+                   <div class="chart-container" v-if="!loading">
+                       <RecentActivity 
+                           :activities="recentActivities"
+                           :loading="loading"
+                       />
+                   </div>
+
+                   <div v-else class="chart-placeholder">
+                       <el-skeleton animated>
+                           <template #template>
+                               <el-skeleton-item variant="rect" style="height: 400px" />
+                           </template>
+                       </el-skeleton>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+
    </div>
 </template>
 
 <script type="text/javascript">
     import {RefreshRight} from "@element-plus/icons-vue";
+    import LineChart from './components/LineChart.vue';
+    import RecentActivity from './components/RecentActivity.vue';
 
     export default {
         name: 'Dashboard',
-        components: {RefreshRight},
+        components: {RefreshRight, LineChart, RecentActivity},
         data() {
             return {
                 loading: false,
-                stats: []
+                stats: [],
+                chartData: [],
+                recentActivities: []
             }
         },
         methods: {
@@ -57,6 +113,8 @@
                     .then(res => {
                         if (res) {
                             this.stats = res.stats;
+                            this.chartData = res.chartData || [];
+                            this.recentActivities = res.recentActivities || [];
                         }
                     })
                     .catch(err => {

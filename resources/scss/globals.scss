@@ -355,6 +355,13 @@ html.dark {
     margin-bottom: 16px;
 }
 
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
 
 
 .fluentshipment-fluid-tab {

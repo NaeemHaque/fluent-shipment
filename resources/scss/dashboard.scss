@@ -118,4 +118,67 @@
       }
     }
   }
+
+  .main-content {
+    display: flex;
+    gap: 24px;
+    flex-direction: row;
+
+    .content-wrapper-left {
+      flex: 2;
+    }
+
+    .content-wrapper-right {
+      flex: 1;
+    }
+  }
+
+  .dashboard-card {
+    background: var(--fluentshipment-primary-bg);
+    border-radius: 12px;
+    margin-bottom: 24px;
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      align-self: stretch;
+      border-bottom: 1px solid var(--fluentshipment-primary-border);
+    }
+
+    .card-title {
+      color: var(--fluentshipment-title-text-color);
+      font-feature-settings: 'ss11' on, 'liga' off, 'calt' off;
+      font-family: Inter;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px;
+      letter-spacing: -0.176px;
+    }
+
+    .chart-container {
+      display: flex;
+      padding: 16px 20px 20px 20px;
+      flex-direction: column;
+      gap: 20px;
+      align-self: stretch;
+    }
+
+    .chart-placeholder {
+      text-align: center;
+      color: var(--fluentshipment-secondary-text);
+
+      .chart-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      p {
+        margin: 0;
+        font-size: 16px;
+      }
+    }
+  }
 }
