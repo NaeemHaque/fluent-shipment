@@ -400,7 +400,7 @@
                                     <el-input 
                                         v-model="createForm.special_instructions" 
                                         type="textarea" 
-                                        rows="3"
+                                        :rows=3
                                         placeholder="Any special delivery instructions..."
                                     />
                                 </el-form-item>
@@ -1205,7 +1205,8 @@ export default {
                 address.country
             ].filter(Boolean);
             
-            return multiline ? parts.join('\\n') : parts.join(', ');
+            // return multiline ? parts.join(', ') : parts.join(', ');
+            return parts.join(', ');
         },
         
         importShipments() {
@@ -1226,8 +1227,7 @@ export default {
             if (this.importForm.date_to) {
                 filters.date_to = this.importForm.date_to;
             }
-            
-            // Build request data
+
             const requestData = {};
             if (Object.keys(filters).length > 0) {
                 requestData.filters = filters;
@@ -1245,12 +1245,10 @@ export default {
                             type: 'success',
                             duration: 0
                         });
-                        
-                        // Reset dialog
+
                         this.showImportDialog = false;
                         this.resetImportForm();
-                        
-                        // Refresh shipments list
+
                         this.fetchShipments();
                     } else {
                         this.$notifyError('Import failed: ' + (res.message || 'Unknown error'));
@@ -1292,7 +1290,6 @@ export default {
             
             const activeIndex = Object.keys(this.primaryTabs).indexOf(this.filters.status);
             if (activeIndex === -1) {
-                // If active tab is in "More views", hide the active bar
                 return -9999;
             }
             
@@ -1310,19 +1307,16 @@ export default {
             
             const activeIndex = Object.keys(this.primaryTabs).indexOf(this.filters.status);
             if (activeIndex === -1 || !this.$refs.tabItems[activeIndex]) {
-                // If active tab is in "More views", hide the active bar
                 return 0;
             }
             
             return this.$refs.tabItems[activeIndex].offsetWidth;
         },
 
-        // Table selection
         handleSelectionChange(selection) {
             this.selectedRows = selection;
         },
-        
-        // Rider related methods
+
         loadActiveRiders() {
             this.loadingRiders = true;
             this.$get('riders/active')
@@ -1358,7 +1352,6 @@ export default {
         },
         
         onStatusChange(status) {
-            // Clear rider selection when status changes
             if (status !== 'out_for_delivery') {
                 this.editForm.rider_id = null;
             }
@@ -1380,7 +1373,6 @@ export default {
             return labels[vehicleType] || vehicleType || 'N/A';
         },
 
-        // Create shipment methods
         createShipment() {
             if (!this.validateCreateForm()) {
                 return;

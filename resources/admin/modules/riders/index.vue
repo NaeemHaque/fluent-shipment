@@ -121,7 +121,7 @@
                                 </template>
                             </el-table-column>
 
-                            <el-table-column prop="phone" label="Phone" width="150">
+                            <el-table-column prop="phone" label="Phone">
                                 <template #default="scope">
                                     {{ scope.row.phone || 'N/A' }}
                                 </template>
@@ -135,7 +135,7 @@
                                 </template>
                             </el-table-column>
 
-                            <el-table-column label="Vehicle" width="150">
+                            <el-table-column label="Vehicle" width="120">
                                 <template #default="scope">
                                     <div>
                                         <div>{{ getVehicleTypeLabel(scope.row.vehicle_type) }}</div>
@@ -146,7 +146,7 @@
                                 </template>
                             </el-table-column>
 
-                            <el-table-column label="Rating" width="100">
+                            <el-table-column label="Rating" width="150">
                                 <template #default="scope">
                                     <div style="display: flex; align-items: center;">
                                         <el-rate 
@@ -161,7 +161,7 @@
                                 </template>
                             </el-table-column>
 
-                            <el-table-column label="Deliveries" width="120">
+                            <el-table-column label="Deliveries" width="130">
                                 <template #default="scope">
                                     <div>
                                         <div>{{ scope.row.total_deliveries }} total</div>
@@ -172,13 +172,13 @@
                                 </template>
                             </el-table-column>
 
-                            <el-table-column prop="joining_date" label="Joined" width="120">
+                            <el-table-column prop="joining_date" label="Joined" width="130">
                                 <template #default="scope">
                                     {{ formatDate(scope.row.joining_date) }}
                                 </template>
                             </el-table-column>
 
-                            <el-table-column align="right" width="80">
+                            <el-table-column align="right" width="70">
                                 <template #default="scope">
                                     <el-dropdown trigger="click" popper-class="action-dropdown">
                                         <span class="more-btn">
@@ -371,7 +371,7 @@
                             <el-input 
                                 v-model="riderForm.notes" 
                                 type="textarea" 
-                                :rows="3"
+                                :rows=3
                                 placeholder="Additional notes about this rider"
                             ></el-input>
                         </el-form-item>
@@ -599,7 +599,6 @@ export default {
                 status: ''
             },
 
-            // Filter tabs
             selectedMoreTab: '',
             allTabs: {
                 '': 'All',
@@ -616,28 +615,24 @@ export default {
         },
 
         moreTabs() {
-            // For riders, we only have 4 statuses, so no more tabs needed
             return {};
         }
     },
 
     mounted() {
         this.fetchRiders();
-        // Ensure the active bar positions correctly after mount
         this.$nextTick(() => {
             this.$forceUpdate();
         });
     },
 
     beforeUnmount() {
-        // Clear timeout to prevent memory leaks
         if (this.searchTimeout) {
             clearTimeout(this.searchTimeout);
         }
     },
     
     methods: {
-        // Debounced search method
         debounceSearch() {
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(() => {
@@ -648,14 +643,12 @@ export default {
 
         fetchRiders() {
             this.loading = true;
-            
-            // Build query parameters
+
             const params = {
                 page: this.pagination.current_page,
                 per_page: this.pagination.per_page
             };
-            
-            // Add filters
+
             Object.keys(this.filters).forEach(key => {
                 if (this.filters[key]) {
                     params[key] = this.filters[key];
@@ -687,7 +680,6 @@ export default {
                 });
         },
 
-        // Pagination handlers
         updatePagination(newPagination) {
             this.pagination = { ...this.pagination, ...newPagination };
             this.fetchRiders();
@@ -704,32 +696,21 @@ export default {
             this.fetchRiders();
         },
 
-        // Navigate to rider profile page
         navigateToProfile(rider) {
-            console.log('Navigating to rider profile:', rider.id);
-            console.log('Current router:', this.$router);
-            
-            // Try different navigation approaches
             try {
-                // Method 1: Using route name with params
                 this.$router.push({ 
                     name: 'riders.profile', 
                     params: { riderId: rider.id } 
                 });
             } catch (error) {
-                console.log('Route name method failed, trying path:', error);
-                
-                // Method 2: Using direct path
                 this.$router.push(`/riders/profile/${rider.id}`);
             }
         },
 
-        // View rider details
         viewRider(rider) {
             this.navigateToProfile(rider);
         },
 
-        // Edit rider
         editRider(rider) {
             this.editingRider = rider;
             this.riderForm = {
@@ -758,7 +739,6 @@ export default {
             this.showCreateDialog = true;
         },
 
-        // Save rider (create or update)
         saveRider() {
             this.$refs.riderFormRef.validate((valid) => {
                 if (!valid) return;
@@ -789,7 +769,6 @@ export default {
             });
         },
 
-        // Close create dialog
         closeCreateDialog() {
             this.showCreateDialog = false;
             this.editingRider = null;
@@ -797,7 +776,6 @@ export default {
             this.$refs.riderFormRef?.clearValidate();
         },
 
-        // Reset rider form
         resetRiderForm() {
             this.riderForm = {
                 rider_name: '',
@@ -824,7 +802,6 @@ export default {
             };
         },
 
-        // Edit status
         editStatus(rider) {
             this.selectedRider = rider;
             this.editForm = {
@@ -861,7 +838,6 @@ export default {
                 });
         },
 
-        // Delete rider
         deleteRider(rider) {
             this.$confirm(
                 `Are you sure you want to delete rider ${rider.rider_name}?`,
@@ -889,7 +865,6 @@ export default {
             });
         },
 
-        // Bulk operations
         bulkUpdateStatus() {
             if (this.selectedRows.length === 0) {
                 this.$notifyError('Please select riders');
@@ -972,7 +947,6 @@ export default {
             });
         },
 
-        // Utility methods
         getInitials(name) {
             if (!name) return 'R';
             return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -1045,7 +1019,6 @@ export default {
             return result || 'N/A';
         },
 
-        // Fluid Tab Methods
         setActiveTab(status) {
             this.filters.status = status;
             this.selectedMoreTab = '';
@@ -1087,7 +1060,6 @@ export default {
             return this.$refs.tabItems[activeIndex].offsetWidth;
         },
 
-        // Table selection
         handleSelectionChange(selection) {
             this.selectedRows = selection;
         }
@@ -1164,13 +1136,12 @@ export default {
 }
 
 .rider-name-link {
-    color: #409EFF;
+    color: var(--fluentshipment-primary-text);
     cursor: pointer;
     text-decoration: none;
     transition: color 0.2s;
     
     &:hover {
-        color: #66b1ff;
         text-decoration: underline;
     }
 }

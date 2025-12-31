@@ -9,36 +9,38 @@ if (!defined('ABSPATH')) {
 
 <div class="fluent-shipment-tracking" id="fluent-shipment-tracking">
     
-    <!-- Header Section -->
-    <div class="fs-tracking-header">
-        <h2 class="fs-tracking-title"><?php echo esc_html($atts['title']); ?></h2>
-    </div>
+   <div class="fs-tracking-header-wrapper">
+       <!-- Header Section -->
+       <div class="fs-tracking-header">
+           <h2 class="fs-tracking-title"><?php echo esc_html($atts['title']); ?></h2>
+       </div>
 
-    <!-- Search Form -->
-    <?php if ($atts['show_search'] === 'yes'): ?>
-    <div class="fs-tracking-search">
-        <form class="fs-search-form" id="fs-tracking-form" method="get">
-            <div class="fs-search-input-group">
-                <input 
-                    type="text" 
-                    name="tracking" 
-                    id="fs-tracking-input"
-                    class="fs-search-input" 
-                    placeholder="<?php echo esc_attr($atts['placeholder']); ?>"
-                    value="<?php echo esc_attr($trackingNumber); ?>"
-                    required
-                >
-                <button type="submit" class="fs-search-button">
-                    <span class="fs-search-text"><?php echo esc_html($atts['button_text']); ?></span>
-                    <span class="fs-search-loading" style="display: none;">
+       <!-- Search Form -->
+       <?php if ($atts['show_search'] === 'yes'): ?>
+           <div class="fs-tracking-search">
+               <form class="fs-search-form" id="fs-tracking-form" method="get">
+                   <div class="fs-search-input-group">
+                       <input
+                               type="text"
+                               name="tracking"
+                               id="fs-tracking-input"
+                               class="fs-search-input"
+                               placeholder="<?php echo esc_attr($atts['placeholder']); ?>"
+                               value="<?php echo esc_attr($trackingNumber); ?>"
+                               required
+                       >
+                       <button type="submit" class="fs-search-button">
+                           <span class="fs-search-text"><?php echo esc_html($atts['button_text']); ?></span>
+                           <span class="fs-search-loading" style="display: none;">
                         <span class="fs-spinner"></span>
                         Searching...
                     </span>
-                </button>
-            </div>
-        </form>
-    </div>
-    <?php endif; ?>
+                       </button>
+                   </div>
+               </form>
+           </div>
+       <?php endif; ?>
+   </div>
 
     <!-- Results Container -->
     <div class="fs-tracking-results" id="fs-tracking-results">

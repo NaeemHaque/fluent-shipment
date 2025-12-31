@@ -241,8 +241,6 @@ class Shipment extends Model
     public static function isMilestoneStatus(string $status): bool
     {
         return in_array($status, [
-            static::STATUS_SHIPPED,
-            static::STATUS_OUT_FOR_DELIVERY,
             static::STATUS_DELIVERED,
             static::STATUS_FAILED,
             static::STATUS_CANCELLED,

@@ -309,7 +309,7 @@ class EmailNotificationService
             $parts[] = $address['country'];
         }
 
-        return implode('<br>', array_filter($parts));
+        return implode(', ', array_filter($parts));
     }
 
     protected static function formatPackageItems(?array $packageInfo): string
