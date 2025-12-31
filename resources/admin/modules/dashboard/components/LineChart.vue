@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-card">
-    <div class="chart-container" v-if="!loading">
+    <div v-if="!loading">
       <div 
         ref="chartRef" 
         class="chart-wrapper"
