@@ -6,6 +6,7 @@ use FluentShipment\App\Models\Shipment;
 use FluentShipment\App\Models\Rider;
 use FluentShipment\App\Utils\Support\Mail;
 use FluentShipment\App\Helpers\DateTimeHelper;
+use Exception;
 
 class EmailNotificationService
 {

@@ -4,7 +4,6 @@ namespace FluentShipment\App\Services;
 
 use FluentShipment\App\Models\Shipment;
 use FluentShipment\App\Models\ShipmentTrackingEvent;
-use FluentShipment\Framework\Randomizer\Randomizer;
 
 class ShipmentService
 {
@@ -20,13 +19,20 @@ class ShipmentService
 
     private static function buildTrackingNumber($type)
     {
-        $prefix     = static::getTrackingPrefix($type);
-        $timestamp  = date('Ymd');
-        $randomizer = new Randomizer();
-        $random     = strtoupper($randomizer->getString(8, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
+        $prefix    = static::getTrackingPrefix($type);
+        $timestamp = date('Ymd');
+
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $length     = 8;
+        $random     = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $random .= $characters[random_int(0, strlen($characters) - 1)];
+        }
 
         return $prefix . $timestamp . $random;
     }
+
 
     private static function getTrackingPrefix($type)
     {

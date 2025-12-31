@@ -2,6 +2,7 @@
 
 namespace FluentShipment\App\Shortcodes;
 
+use FluentShipment\App\App;
 use FluentShipment\App\Models\Shipment;
 use FluentShipment\App\Models\ShipmentTrackingEvent;
 
@@ -31,8 +32,6 @@ class TrackingShortcode
 
             $this->enqueuePublicAssets();
 
-            ob_start();
-
             $trackingNumber = $this->getTrackingNumber();
             $shipment       = null;
             $trackingEvents = [];
@@ -46,22 +45,10 @@ class TrackingShortcode
                     }
                 }
             }
+            $view = App::make('view');
+            $view->render('public-tracking', compact('atts', 'trackingNumber', 'shipment', 'trackingEvents'));
 
-            $templatePath = $this->getTemplatePath('public-tracking.php');
-
-            if ( ! file_exists($templatePath)) {
-                $debugInfo = "Template file not found. Looking for: " . $templatePath;
-                error_log('FluentShipment Template Error: ' . $debugInfo);
-
-                return '<div class="fluent-shipment-error">Template file not found.<br><small>Path: ' . esc_html(
-                        $templatePath
-                    ) . '</small></div>';
-            }
-
-            include $templatePath;
-
-            return ob_get_clean();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return '<div class="fluent-shipment-error">Unable to load tracking form. Please try again later.</div>';
         }
     }
@@ -168,23 +155,6 @@ class TrackingShortcode
         }
 
         return 'N/A';
-    }
-
-    private function getTemplatePath($template)
-    {
-        $currentDir = __DIR__;
-        $appDir     = dirname($currentDir);
-        $pluginRoot = dirname($appDir);
-        $pluginPath = $pluginRoot . '/resources/views/' . $template;
-
-        // Allow theme overrides
-        $themeTemplate = locate_template(['fluent-shipment/' . $template]);
-
-        if ($themeTemplate) {
-            return $themeTemplate;
-        }
-
-        return $pluginPath;
     }
 
     private function enqueuePublicAssets()
