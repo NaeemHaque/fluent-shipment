@@ -622,19 +622,22 @@
                                 :value="rider.id"
                             >
                                 <div class="rider-option">
-                                    <div class="rider-avatar-small">
-                                        <img v-if="rider.avatar_url" :src="rider.avatar_url" :alt="rider.rider_name" />
-                                        <div v-else class="avatar-placeholder-small">
-                                            {{ getInitials(rider.rider_name) }}
+                                    <div class="rider-info-wrapper">
+                                        <div class="rider-avatar-small">
+                                            <img v-if="rider.avatar_url" :src="rider.avatar_url" :alt="rider.rider_name" />
+                                            <div v-else class="avatar-placeholder-small">
+                                                {{ getInitials(rider.rider_name) }}
+                                            </div>
+                                        </div>
+                                        <div class="rider-info">
+                                            <p class="rider-name">{{ rider.rider_name }}</p>
+                                            <div class="rider-details">
+                                                <p class="rider-phone">{{ rider.phone || 'No phone' }}</p>
+                                                <p class="rider-vehicle">{{ getVehicleTypeLabel(rider.vehicle_type) }}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="rider-info">
-                                        <p class="rider-name">{{ rider.rider_name }}</p>
-                                        <div class="rider-details">
-                                            <p class="rider-phone">{{ rider.phone || 'No phone' }}</p>
-                                            <p class="rider-vehicle">{{ getVehicleTypeLabel(rider.vehicle_type) }}</p>
-                                        </div>
-                                    </div>
+
                                     <div class="rider-rating">
                                         <el-rate v-model="rider.rating" disabled size="small" show-score score-template="{value}"/>
                                     </div>
@@ -1490,8 +1493,13 @@ export default {
 .rider-option {
     display: flex;
     align-items: center;
-    gap: 0 12px;
-    padding: 4px 0;
+    justify-content: space-between;
+    padding: 6px 0;
+
+    .rider-info-wrapper {
+        display: flex;
+        gap: 8px;
+    }
     
     .rider-avatar-small {
         width: 32px;
@@ -1522,6 +1530,9 @@ export default {
     .rider-info {
         flex: 1;
         min-width: 0;
+        p{
+            margin: 0;
+        };
         
         .rider-name {
             font-weight: 500;

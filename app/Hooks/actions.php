@@ -37,3 +37,20 @@ $app->addAction('init', function() {
  */
 
 // $app->addAction('init', 'CPTHandler@registerPostTypes');
+
+add_action('admin_init', function () {
+
+    if (!is_admin()) {
+        return;
+    }
+
+    $screen = get_current_screen();
+
+    if ($screen && strpos($screen->id, 'fluentshipment') !== false) {
+        return;
+    }
+
+    // Remove all admin notices
+    remove_all_actions('admin_notices');
+    remove_all_actions('all_admin_notices');
+});

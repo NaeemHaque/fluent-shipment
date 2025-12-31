@@ -231,6 +231,7 @@
 .fs-timeline-status.status-cancelled,
 .fs-timeline-status.status-default {
     background-color: unset;
+    color: #2c3e50;
 }
 
 /* Shipment Details */

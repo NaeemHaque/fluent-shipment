@@ -6,8 +6,8 @@ $app->addAction('admin_head', function () use ($app) {
     $screen = get_current_screen();
     $slug = $app->config->get('app.slug');
     if ($screen && $screen->id === "toplevel_page_$slug") {
-        $url = plugin_dir_url($app->__pluginfile__) . 'resources/images/favicon.png';
-        $file = plugin_dir_path($app->__pluginfile__) . 'resources/images/favicon.png';
+        $url = plugin_dir_url($app->__pluginfile__) . 'resources/images/favicon.ico';
+        $file = plugin_dir_path($app->__pluginfile__) . 'resources/images/favicon.ico';
         if (file_exists($file)) {
             echo '<link rel="icon" href="' . esc_url($url) . '" sizes="32x32" />';
             echo '<link rel="shortcut icon" href="' . esc_url($url) . '" />';

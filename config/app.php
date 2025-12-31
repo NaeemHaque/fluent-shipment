@@ -10,5 +10,5 @@ return array(
     'hook_prefix'    => 'fluentshipment',
     'rest_namespace' => 'fluentshipment',
     'rest_version'   => 'v2',
-    'env'            => 'dev',
+    'env'            => 'production',
 );

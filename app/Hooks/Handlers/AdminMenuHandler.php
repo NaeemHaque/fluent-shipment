@@ -241,9 +241,9 @@ class AdminMenuHandler
     protected function getMenuIcon()
     {
         if (str_starts_with($this->app->env(), 'dev')) {
-            $path = 'resources/images/favicon.png';
+            $path = 'resources/images/logo.ico';
         } else {
-            $path = 'assets/images/favicon.png';
+            $path = 'assets/images/favicon.ico';
         }
 
         $file = plugin_dir_path($this->app->__pluginfile__) . $path;
