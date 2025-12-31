@@ -7,12 +7,14 @@
 use FluentShipment\App\Http\Controllers\DashboardController;
 use FluentShipment\App\Http\Controllers\ShipmentController;
 use FluentShipment\App\Http\Controllers\RiderController;
+use FluentShipment\App\Http\Controllers\SettingsController;
 
 $router->get('/dashboard', [DashboardController::class, 'index']);
 
 $router->prefix('/shipments')->group(function () use ($router) {
     $router->get('/', [ShipmentController::class, 'index']);
     $router->post('/', [ShipmentController::class, 'store']);
+    $router->get('/stats', [ShipmentController::class, 'stats']);
     
     // FluentCart integration
     $router->post('/import/fluent-cart', [ShipmentController::class, 'importFromFluentCart']);
@@ -46,4 +48,16 @@ $router->prefix('/riders')->group(function () use ($router) {
     $router->put('/{id}/status', [RiderController::class, 'updateStatus']);
     $router->put('/{id}/rating', [RiderController::class, 'updateRating']);
     $router->delete('/{id}', [RiderController::class, 'delete']);
+});
+
+$router->prefix('/settings')->group(function () use ($router) {
+    $router->get('/email', [SettingsController::class, 'getEmailSettings']);
+    $router->post('/email', [SettingsController::class, 'updateEmailSettings']);
+    $router->post('/email/test', [SettingsController::class, 'testEmail']);
+    $router->get('/smtp', [SettingsController::class, 'getSmtpSettings']);
+    $router->post('/smtp', [SettingsController::class, 'updateSmtpSettings']);
+
+    // General settings
+    $router->get('/general', [SettingsController::class, 'getGeneralSettings']);
+    $router->post('/general', [SettingsController::class, 'updateGeneralSettings']);
 });

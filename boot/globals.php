@@ -38,7 +38,7 @@ if (!function_exists('fluentShipmentSanitizeArray')) {
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $array[$key] = credexSanitizeArray($value);
+                $array[$key] = fluentShipmentSanitizeArray($value);
             } else {
                 $array[$key] = wp_kses_post($value);
             }

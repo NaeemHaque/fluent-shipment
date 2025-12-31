@@ -4,6 +4,7 @@ namespace FluentShipment\App\Models;
 
 use FluentShipment\App\Models\Model;
 use FluentShipment\App\Helpers\DateTimeHelper;
+use FluentShipment\App\Services\EmailNotificationService;
 use FluentShipment\Framework\Database\Orm\Relations\HasMany;
 
 class Shipment extends Model
@@ -195,7 +196,6 @@ class Shipment extends Model
         $oldStatus            = $this->current_status;
         $this->current_status = $newStatus;
 
-        // Set specific timestamps based on status
         if ($newStatus === static::STATUS_SHIPPED && ! $this->shipped_at) {
             $this->shipped_at = DateTimeHelper::now();
         }
@@ -204,7 +204,6 @@ class Shipment extends Model
             $this->delivered_at = DateTimeHelper::now();
         }
 
-        // Clear delivered_at if status changes from delivered
         if ($oldStatus === static::STATUS_DELIVERED && $newStatus !== static::STATUS_DELIVERED) {
             $this->delivered_at = null;
         }
@@ -213,6 +212,8 @@ class Shipment extends Model
 
         if ($saved && $newStatus !== $oldStatus) {
             $this->createTrackingEvent($newStatus, $eventData);
+
+            $this->sendStatusNotificationEmail($newStatus, $oldStatus);
         }
 
         return $saved;
@@ -279,5 +280,18 @@ class Shipment extends Model
             static::STATUS_IN_TRANSIT,
             static::STATUS_OUT_FOR_DELIVERY
         ]);
+    }
+
+    protected function sendStatusNotificationEmail(string $newStatus, string $oldStatus): void
+    {
+        if ($newStatus === static::STATUS_PROCESSING && $oldStatus !== static::STATUS_PROCESSING) {
+            EmailNotificationService::sendShipmentNotification($this, EmailNotificationService::EMAIL_TYPE_PROCESSING);
+        }
+
+        if ($newStatus === static::STATUS_DELIVERED && $oldStatus !== static::STATUS_DELIVERED) {
+            EmailNotificationService::sendShipmentNotification($this, EmailNotificationService::EMAIL_TYPE_DELIVERED);
+        }
+
+        do_action('fluentshipment_status_changed', $this, $newStatus, $oldStatus);
     }
 }
