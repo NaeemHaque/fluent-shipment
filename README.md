@@ -12,7 +12,8 @@ Fluent Shipment is a WordPress plugin for managing and tracking e-commerce shipm
 ## 🔗 Quick Access
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Try_Now-brightgreen?style=for-the-badge&logo=wordpress)](https://dev-ninjatables.pantheonsite.io/wp-admin/?wtlwp_token=10b43ef3005fafb162cd895bc2266f5b5719ff14b0dbce1b6a4fd1b4c0c7db93c512e9eab2c31a682ae7d56c3a2ab26847fd880f13b26573784c501a7da05899)
-[![Video Demo](https://img.shields.io/badge/Video_Demo-Watch_Now-red?style=for-the-badge&logo=youtube)](https://youtu.be/VnFdJlhevGs)
+[![Presentation Video](https://img.shields.io/badge/Presentation_Video-Watch_Now-blue?style=for-the-badge&logo=youtube)](https://youtu.be/bB3l2otoqCM)
+[![Short Demo](https://img.shields.io/badge/Short_Demo-Watch_Now-red?style=for-the-badge&logo=youtube)](https://youtu.be/VnFdJlhevGs)
 
 ## Features
 
