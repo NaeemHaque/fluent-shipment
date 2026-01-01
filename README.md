@@ -1,6 +1,8 @@
 # Fluent Shipment
 
-A comprehensive shipment tracking and management solution for WordPress with support for multiple e-commerce platforms.
+Fluent Shipment is a WordPress plugin for managing and tracking e-commerce shipments. It supports manual shipments, FluentCart imports, rider assignment, and a centralized dashboard—while automatically notifying customers by email at every stage of delivery.
+
+
 
 ![License](https://img.shields.io/badge/license-GPL--2.0-blue.svg)
 ![PHP Version](https://img.shields.io/badge/php-%3E%3D7.4-green.svg)
@@ -9,8 +11,8 @@ A comprehensive shipment tracking and management solution for WordPress with sup
 
 ## 🔗 Quick Access
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Try_Now-brightgreen?style=for-the-badge&logo=wordpress)](https://dev-ninjatables.pantheonsite.io/wp-admin/admin.php?page=fluentshipment#/)
-[![Video Demo](https://img.shields.io/badge/Video_Demo-Watch_Now-red?style=for-the-badge&logo=youtube)](https://youtu.be/iifLgYERIIQ?si=eQCmZV6CMLHq1Cew)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Try_Now-brightgreen?style=for-the-badge&logo=wordpress)](https://dev-ninjatables.pantheonsite.io/wp-admin/?wtlwp_token=10b43ef3005fafb162cd895bc2266f5b5719ff14b0dbce1b6a4fd1b4c0c7db93c512e9eab2c31a682ae7d56c3a2ab26847fd880f13b26573784c501a7da05899)
+[![Video Demo](https://img.shields.io/badge/Video_Demo-Watch_Now-red?style=for-the-badge&logo=youtube)](https://youtu.be/VnFdJlhevGs)
 
 ## Features
 
