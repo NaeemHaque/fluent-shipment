@@ -46,7 +46,8 @@ class TrackingShortcode
                 }
             }
             $view = App::make('view');
-            $view->render('public-tracking', compact('atts', 'trackingNumber', 'shipment', 'trackingEvents'));
+
+            return $view->make('public-tracking', compact('atts', 'trackingNumber', 'shipment', 'trackingEvents'));
 
         } catch (\Exception $e) {
             return '<div class="fluent-shipment-error">Unable to load tracking form. Please try again later.</div>';
